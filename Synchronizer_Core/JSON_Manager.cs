@@ -10,6 +10,7 @@ namespace Synchronizer_Core.Vault_Manager
         protected bool JSON_Can_Open=false;
         protected String path = "";
 
+        public String Name { get { return Path.GetFileName(path)??"Can`t open or not exist"; }  set { } }
 
         public JSON_Manager() {}
         public void Open(string path)
@@ -47,6 +48,26 @@ namespace Synchronizer_Core.Vault_Manager
                 JsonSerializer.Serialize<LinkedList<Tuple<string, string>>>(file, list);
                 //JSON_File.Flush();
             }
+        }
+
+        public override string ToString()
+        {
+            string inf = $"\t{path}\n\tCan open:{JSON_Can_Open}";
+
+            if (JSON_Can_Open) {
+                using (var file = File.Open(path, FileMode.Open))
+                {
+                    LinkedList<Tuple<string, string>>? res = JsonSerializer.Deserialize<LinkedList<Tuple<string, string>>>(file);
+
+                    if (res == null) { inf += $"\tCan`t desiralize"; }
+                    else {
+                        inf += $"\tsize: {res.Count}";
+                    }
+                    
+                }
+            }
+
+            return inf;
         }
     }
 }

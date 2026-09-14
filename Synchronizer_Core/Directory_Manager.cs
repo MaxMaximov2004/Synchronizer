@@ -46,16 +46,17 @@ namespace Synchronizer_Core
                 
                 /*Если где-то нет папок - создаём их*/
                 if( !Path.Exists(file.Item2)) 
-                { 
-                    Directory.CreateDirectory(
+                {
+                    File.Create(
                         file.Item2.Trim(
                             Path.GetFileName(
                                 file.Item2).ToString().ToCharArray())); 
+                    
                 }
 
                 if (!Path.Exists(file.Item1))
                 {
-                    Directory.CreateDirectory(
+                    File.Create(
                         file.Item1.Trim(
                             Path.GetFileName(
                                 file.Item1).ToString().ToCharArray()));
