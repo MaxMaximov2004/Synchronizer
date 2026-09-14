@@ -27,7 +27,6 @@ namespace Synchronizer_Core
 
         public void Add_Path(String dist_path, String sync_path)
         {
-
             if (File.Exists(sync_path))
             {
                 files.AddLast( Tuple.Create(dist_path, sync_path));
@@ -41,27 +40,41 @@ namespace Synchronizer_Core
         {
         
             /*Придумать эффективный механизм разрешения типа управления, по умолчанию - Standart*/
+            
             foreach(Tuple<string, string> file in files) 
-            { 
-                
+            {
+
                 /*Если где-то нет папок - создаём их*/
-                if( !Path.Exists(file.Item2)) 
-                {
-                    File.Create(
-                        file.Item2.Trim(
-                            Path.GetFileName(
-                                file.Item2).ToString().ToCharArray())); 
-                    
+                /*{
+                    //DirectoryInfo dist_info = new DirectoryInfo(file.Item2);
+
+                    if (!Directory.Exists(file.Item2))
+                    {
+                        Directory.CreateDirectory(file.Item2);
+
+                        //File.Create(
+                        //    file.Item2.Trim(
+                        //        Path.GetFileName(
+                        //            file.Item2).ToString().ToCharArray())); 
+
+                    }
                 }
 
-                if (!Path.Exists(file.Item1))
-                {
-                    File.Create(
-                        file.Item1.Trim(
-                            Path.GetFileName(
-                                file.Item1).ToString().ToCharArray()));
-                }
 
+
+                {
+
+                    if (!Directory.Exists(file.Item1))
+                    {
+                        Directory.CreateDirectory(file.Item1);
+                        //File.Create(
+                        //    file.Item1.Trim(
+                        //        Path.GetFileName(
+                        //            file.Item1).ToString().ToCharArray()));
+                    }
+                }*/
+                
+                
                 /*first-dist  second-sync*/
                 if (File.Exists(file.Item1)&&File.Exists(file.Item2))
                 {
@@ -86,6 +99,7 @@ namespace Synchronizer_Core
                     } else {
 
                         if (!File.Exists(file.Item2)) {
+
                             File.Copy(file.Item1,file.Item2, true);
                         }
                     }

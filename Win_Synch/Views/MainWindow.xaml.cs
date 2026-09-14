@@ -33,7 +33,7 @@ namespace Win_Synch
         }
 
         //Это и прочие обработчики кликов ниже нужно заменить на команды
-        private void MenuItem_Click(object sender, RoutedEventArgs e)
+        private void MenuItem_Click(object sender, RoutedEventArgs e)//создание еденицы синхронизации
         {
             var context = this.DataContext as MainWindow_VM;
             if (context != null) {
@@ -57,7 +57,8 @@ namespace Win_Synch
 
                     JSON_Manager manager = new JSON_Manager();
                     {
-                        string path = System.IO.Path.Combine(context.path_working_dir, $"{DateTime.Now.Ticks}.json");
+                        DateTime now = DateTime.Now;
+                        string path = System.IO.Path.Combine(context.path_working_dir, $"{now.Year}_{now.Day}_{now.DayOfWeek}  {now.Hour}-{now.Minute}-{now.Second}.json");
                         File.Create(path).Close();
                         manager.Open(path);
                     }
@@ -67,14 +68,29 @@ namespace Win_Synch
                     DirectoryInfo sorce_dir = new DirectoryInfo(new_source);
                     DirectoryInfo synch_dir = new DirectoryInfo(new_synch);
 
-                    foreach(var source_file in sorce_dir.GetFiles())
+                    Debug.WriteLine($"{new_source} {new_synch}\nFiles:");
+
+
+                    foreach (var source_file in sorce_dir.GetFiles()) {
+
+                        tuples.AddLast(Tuple.Create(
+                            System.IO.Path.Combine(new_synch,source_file.Name),
+                            source_file.FullName
+                                ));
+                        Debug.WriteLine($"source:{source_file.FullName} dist:{System.IO.Path.Combine(new_synch, source_file.Name)}");
+                    }
+
+                    /*foreach(var source_file in sorce_dir.GetFiles())
                     {
                         foreach(var synch_files in synch_dir.GetFiles())
                         {
 
-                            tuples.AddLast(Tuple.Create(source_file.FullName, synch_files.FullName));
+                            tuples.AddLast(Tuple.Create(synch_files.FullName, source_file.FullName));
+                            Debug.WriteLine($"source:{source_file.FullName} dist:{synch_files.FullName}");
                         }
-                    }
+                    }*/
+
+
                     manager.Save(tuples);
                     context.Manage_Units.Add(manager);
                 }
@@ -82,7 +98,7 @@ namespace Win_Synch
 
         }
 
-        private void MenuItem_Click_1(object sender, RoutedEventArgs e)
+        private void MenuItem_Click_1(object sender, RoutedEventArgs e)//Отладка
         {
             var context = this.DataContext as MainWindow_VM;
             if (context != null)
@@ -96,7 +112,7 @@ namespace Win_Synch
             }
         }
 
-        private void Button_Click(object sender, RoutedEventArgs e)
+        private void Button_Click(object sender, RoutedEventArgs e)//Синхронизация
         {
             
             JSON_Manager? item = (sender as Button).CommandParameter as JSON_Manager;
@@ -109,7 +125,7 @@ namespace Win_Synch
 
                 
                 foreach (var file in files) { 
-                    directory.Add_Path(file.Item2, file.Item1);
+                    directory.Add_Path(file.Item1, file.Item2);
                     Debug.WriteLine($"{file.Item1} <+> {file.Item2}");
                 }
 

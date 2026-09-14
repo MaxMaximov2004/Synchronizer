@@ -1,4 +1,5 @@
 ﻿
+using Synchronizer_Core;
 using Synchronizer_Core.Vault_Manager;
 using System.Collections.Generic;
 using System.Text.Json;
@@ -55,7 +56,7 @@ foreach(var data in manage.Get())
 
 
 
-/*
+
 Directory_Manager  manager = new Directory_Manager();
 
 var source = @"C:\Users\Макс\Desktop\source\test_0.txt";
@@ -67,5 +68,5 @@ manager.Synchronize();
 foreach(String str in manager.Error)
 {
     Console.WriteLine(str);
-}*/
+}
 

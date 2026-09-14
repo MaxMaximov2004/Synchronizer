@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Text.Json;
+using System.Diagnostics;
 
 namespace Synchronizer_Core.Vault_Manager
 {
@@ -43,6 +44,12 @@ namespace Synchronizer_Core.Vault_Manager
         public override void Save(LinkedList<Tuple<string, string>> list)
         {
             if (!JSON_Can_Open) { throw new MemberAccessException("You must turn me available path to json file"); }
+
+            Debug.WriteLine("To Save:");
+            foreach (var item in list) {
+                Debug.WriteLine($"{item.Item1} {item.Item2}");
+            }
+
             using (var file = File.Open(path,FileMode.Open))
             {
                 JsonSerializer.Serialize<LinkedList<Tuple<string, string>>>(file, list);
