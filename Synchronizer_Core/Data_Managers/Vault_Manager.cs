@@ -7,41 +7,43 @@ using System.Threading.Tasks;
 
 namespace Synchronizer_Core.Vault_Manager
 {
-    //public class Managed_Data
-    //{
-    //    public Managed_Data() {
-    //        Data = new LinkedList<Tuple<string, string>>();
-    //        Data_Name = "";
-    //    }
+    public record Managed_Data
+    {
+        public String Distination {  get; set; }
+        public String Source { get; set; }
 
-    //    public Managed_Data(LinkedList<Tuple<string, string>> data, string data_name)
-    //    {
-    //        Data = data;
-    //        Data_Name = data_name;
-    //    }
+        public Managed_Data(String distination, String source)
+        {
+            Distination = distination;
+            Source = source;
+        }
 
-    //    public LinkedList<Tuple<string,string>> Data { get; set; }
-    //    public string Data_Name { get; set; }
-    //}
+        public void Deconstruct(out string Item1, out string Item2)
+        {
+            Item1 = Source;
+            Item2 = Distination;
+        }
+    }
+
+
 
     //Базовый абстрактный класс инкапсулирующий работу с конкретным хранилищем: реестр, отдельные файлы и тд. 
-    
     abstract public class Vault_Manager
     {
-        abstract public void Save(LinkedList<Tuple<string, string>> list);
-        abstract public LinkedList<Tuple<string, string>> Get();
+        abstract public void Save(LinkedList<Managed_Data> list);
+        abstract public LinkedList<Managed_Data> Get();
         
     }
 
     /*TODO реализовать этот класс*/
     public class Registry_Manager : Vault_Manager
     {
-        public override LinkedList<Tuple<string, string>> Get()
+        public override LinkedList<Managed_Data> Get()
         {
             throw new NotImplementedException();
         }
 
-        public override void Save(LinkedList<Tuple<string, string>> list)
+        public override void Save(LinkedList<Managed_Data> list)
         {
             throw new NotImplementedException();
         }

@@ -5,6 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.IO;
 
+using Synchronizer_Core.Vault_Manager;
+using System.Diagnostics;
 
 namespace Synchronizer_Core
 {
@@ -17,99 +19,102 @@ namespace Synchronizer_Core
     }
 
 
+    //Управляем только директориями, при синхронизации ищем файлы в директории и такие же в папки синхронизации
     public class Directory_Manager
     {
-        protected LinkedList<Tuple<string, string>> files;
-
-
-        public Directory_Manager() {    files = new LinkedList<Tuple<string, string>>();    }
         public LinkedList<String> Error { get; set; } = new LinkedList<string> { };
+        protected LinkedList<Tuple<string, string>> dirs;
+        //Item 1 = Source
+        //Item 2 = Distination
 
-        public void Add_Path(String dist_path, String sync_path)
+        public Directory_Manager() { dirs = new LinkedList<Tuple<string, string>>();    }
+        public Directory_Manager(List<Managed_Data> data) {
+
+            dirs = new LinkedList<Tuple<string, string>>();
+            foreach (Managed_Data path in data) { dirs.AddLast(Tuple.Create(path.Source,path.Distination)); }
+        }
+
+        // sync_path - папка которую необходимо синхронизировать
+        // dist_path - папка в которой будет хранится синхронизируемая папка (вместе с версиями)
+        // Получение 2-ух директорий, проверка то что они существуют и настроука директории синхронизации
+        public void Add_Path(String sync_path, String dist_path)
         {
-            if (File.Exists(sync_path))
+
+            if (Directory.Exists(sync_path) && Directory.Exists(dist_path))
             {
-                files.AddLast( Tuple.Create(dist_path, sync_path));
-            } else
-            {
-                throw new ArgumentException("Sync path is invalid! It`s must be exist");
+
+                DirectoryInfo sync_info = new DirectoryInfo(sync_path);
+                DirectoryInfo dist_info = new DirectoryInfo(dist_path);
+
+                if (!dist_info.EnumerateDirectories().Any(inf => (inf.Name == sync_info.Name)))
+                {
+                    dist_info.CreateSubdirectory(sync_info.Name);
+                    dist_info = new DirectoryInfo(Path.Combine(dist_path, sync_info.Name));
+                } else
+                {
+                    dist_info = new DirectoryInfo(Path.Combine(dist_path, sync_info.Name));
+                }
+
+                dirs.AddLast(
+                    Tuple.Create(sync_info.FullName, dist_info.FullName)
+                    );
+
+                {
+                    HashSet<DirectoryInfo> not_checked_dirs = new HashSet<DirectoryInfo>() { sync_info };
+
+                    while (not_checked_dirs.Count > 0)
+                    {
+
+                        HashSet<DirectoryInfo> child_dirs = new HashSet<DirectoryInfo>();
+                        foreach (DirectoryInfo dir in not_checked_dirs)
+                        {
+                            foreach(DirectoryInfo child_dir in dir.GetDirectories())
+                            {
+                                child_dirs.Add(child_dir);
+                                
+                                if (!Directory.Exists(
+                                        Path.Combine(
+                                            dist_info.FullName, $"{child_dir.FullName.Replace(sync_path + Path.DirectorySeparatorChar, "")}"
+                                            )
+                                    ))
+                                {
+                                    dist_info.CreateSubdirectory($"{child_dir.FullName.Replace(sync_path + Path.DirectorySeparatorChar, "")}");
+
+                                }
+
+                                dirs.AddLast(
+                                    Tuple.Create(
+                                        child_dir.FullName, 
+                                        Path.Combine(
+                                            dist_info.FullName, 
+                                            $"{child_dir.FullName.Replace(sync_path + Path.DirectorySeparatorChar, "")}"
+                                            ))
+                                    );
+
+                            }
+
+                            
+                        }
+                        not_checked_dirs = child_dirs;
+
+
+                    }
+
+                }
+
+                
+
+            }
+            else {
+
+                throw new ArgumentException($"Directory: {sync_path} and {dist_path} must exist ");
             }
         }
 
         public void Synchronize(Manage_Type manage_type = Manage_Type.Standart)
         {
         
-            /*Придумать эффективный механизм разрешения типа управления, по умолчанию - Standart*/
-            
-            foreach(Tuple<string, string> file in files) 
-            {
-
-                /*Если где-то нет папок - создаём их*/
-                /*{
-                    //DirectoryInfo dist_info = new DirectoryInfo(file.Item2);
-
-                    if (!Directory.Exists(file.Item2))
-                    {
-                        Directory.CreateDirectory(file.Item2);
-
-                        //File.Create(
-                        //    file.Item2.Trim(
-                        //        Path.GetFileName(
-                        //            file.Item2).ToString().ToCharArray())); 
-
-                    }
-                }
-
-
-
-                {
-
-                    if (!Directory.Exists(file.Item1))
-                    {
-                        Directory.CreateDirectory(file.Item1);
-                        //File.Create(
-                        //    file.Item1.Trim(
-                        //        Path.GetFileName(
-                        //            file.Item1).ToString().ToCharArray()));
-                    }
-                }*/
-                
-                
-                /*first-dist  second-sync*/
-                if (File.Exists(file.Item1)&&File.Exists(file.Item2))
-                {
-                    DateTime date_dist = new FileInfo(file.Item1).LastWriteTime;
-                    DateTime date_sync = new FileInfo(file.Item2).LastWriteTime;
-
-                    if (date_sync > date_dist)
-                    {
-                        File.Copy(file.Item2, file.Item1, true);
-                    } else
-                    {
-                        File.Copy(file.Item1, file.Item2, true);
-                    }
-
-                } else
-                {
-                    Error.AddLast($"{DateTime.Now} files not exist:{ (File.Exists(file.Item1) ? file.Item1: "") } { (File.Exists(file.Item2)? file.Item2:"") } {(File.Exists(file.Item2) && File.Exists(file.Item1)?"Can`t create":"Create")}");
-                    
-                    if (!File.Exists(file.Item1))
-                    {
-                       File.Copy(file.Item2,file.Item1, true);
-                    } else {
-
-                        if (!File.Exists(file.Item2)) {
-
-                            File.Copy(file.Item1,file.Item2, true);
-                        }
-                    }
-
-                }
-
-
-            }
-            
-
+            throw new NotImplementedException("wORK in progress!");
         }
         
 
