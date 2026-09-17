@@ -28,7 +28,7 @@ namespace Synchronizer_Core
         //Item 2 = Distination
 
         public Directory_Manager() { dirs = new LinkedList<Tuple<string, string>>();    }
-        public Directory_Manager(List<Managed_Data> data) {
+        public Directory_Manager(LinkedList<Managed_Data> data) {
 
             dirs = new LinkedList<Tuple<string, string>>();
             foreach (Managed_Data path in data) { dirs.AddLast(Tuple.Create(path.Source,path.Distination)); }

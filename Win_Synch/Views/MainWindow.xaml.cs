@@ -39,7 +39,7 @@ namespace Win_Synch
             if (context != null) {
                 var FolderDialogSource = new OpenFolderDialog();
                 string? new_source = null;
-                string? new_synch = null;
+                string? new_dist = null;
                 
                 if (FolderDialogSource.ShowDialog()??false)
                 {
@@ -49,10 +49,10 @@ namespace Win_Synch
                 var FolderDialogSynch = new OpenFolderDialog();
                 if (FolderDialogSynch.ShowDialog() ?? false)
                 {
-                    new_synch = FolderDialogSynch.FolderName;
+                    new_dist = FolderDialogSynch.FolderName;
                 }
 
-                if ((new_source != null) && (new_synch != null))
+                if ((new_source != null) && (new_dist != null))
                 {
 
                     JSON_Manager manager = new JSON_Manager();
@@ -62,37 +62,48 @@ namespace Win_Synch
                         File.Create(path).Close();
                         manager.Open(path);
                     }
-                    LinkedList<Tuple<string,string>> tuples = new LinkedList<Tuple<string,string>>();
-                    //tuples.AddLast(Tuple.Create(new_source,new_synch));
 
-                    DirectoryInfo sorce_dir = new DirectoryInfo(new_source);
-                    DirectoryInfo synch_dir = new DirectoryInfo(new_synch);
+                    Directory_Manager directory_Manager = new Directory_Manager();
+                    directory_Manager.Add_Path(new_source, new_dist);
+                    directory_Manager.Synchronize();
 
-                    Debug.WriteLine($"{new_source} {new_synch}\nFiles:");
-
-
-                    foreach (var source_file in sorce_dir.GetFiles()) {
-
-                        tuples.AddLast(Tuple.Create(
-                            System.IO.Path.Combine(new_synch,source_file.Name),
-                            source_file.FullName
-                                ));
-                        Debug.WriteLine($"source:{source_file.FullName} dist:{System.IO.Path.Combine(new_synch, source_file.Name)}");
-                    }
-
-                    /*foreach(var source_file in sorce_dir.GetFiles())
-                    {
-                        foreach(var synch_files in synch_dir.GetFiles())
-                        {
-
-                            tuples.AddLast(Tuple.Create(synch_files.FullName, source_file.FullName));
-                            Debug.WriteLine($"source:{source_file.FullName} dist:{synch_files.FullName}");
-                        }
-                    }*/
-
-
-                    manager.Save(tuples);
+                    manager.Save(directory_Manager.Export_Data());
                     context.Manage_Units.Add(manager);
+
+                    
+                    
+
+                    //LinkedList<Tuple<string,string>> tuples = new LinkedList<Tuple<string,string>>();
+                    ////tuples.AddLast(Tuple.Create(new_source,new_synch));
+
+                    //DirectoryInfo sorce_dir = new DirectoryInfo(new_source);
+                    //DirectoryInfo synch_dir = new DirectoryInfo(new_synch);
+
+                    //Debug.WriteLine($"{new_source} {new_synch}\nFiles:");
+
+
+                    //foreach (var source_file in sorce_dir.GetFiles()) {
+
+                    //    tuples.AddLast(Tuple.Create(
+                    //        System.IO.Path.Combine(new_synch,source_file.Name),
+                    //        source_file.FullName
+                    //            ));
+                    //    Debug.WriteLine($"source:{source_file.FullName} dist:{System.IO.Path.Combine(new_synch, source_file.Name)}");
+                    //}
+
+                    ///*foreach(var source_file in sorce_dir.GetFiles())
+                    //{
+                    //    foreach(var synch_files in synch_dir.GetFiles())
+                    //    {
+
+                    //        tuples.AddLast(Tuple.Create(synch_files.FullName, source_file.FullName));
+                    //        Debug.WriteLine($"source:{source_file.FullName} dist:{synch_files.FullName}");
+                    //    }
+                    //}*/
+
+
+                    //manager.Save(tuples);
+                    //context.Manage_Units.Add(manager);
                 }
             }
 
@@ -118,24 +129,35 @@ namespace Win_Synch
             JSON_Manager? item = (sender as Button).CommandParameter as JSON_Manager;
             if(item != null)
             {
-                Debug.WriteLine("Beging synch");
+                LinkedList<Managed_Data>? dir_list = null;
 
-                Directory_Manager directory = new Directory_Manager();
-                LinkedList<Tuple<string, string>> files = item.Get();
+                try
+                {
+                    dir_list = item.Get();
+                }
+                catch (Exception ex) { }
+
+                Directory_Manager manager = new Directory_Manager(dir_list);
+                manager.Synchronize();
+                
+                //Debug.WriteLine("Beging synch");
+
+                //Directory_Manager directory = new Directory_Manager();
+                //LinkedList<Tuple<string, string>> files = item.Get();
 
                 
-                foreach (var file in files) { 
-                    directory.Add_Path(file.Item1, file.Item2);
-                    Debug.WriteLine($"{file.Item1} <+> {file.Item2}");
-                }
+                //foreach (var file in files) { 
+                //    directory.Add_Path(file.Item1, file.Item2);
+                //    Debug.WriteLine($"{file.Item1} <+> {file.Item2}");
+                //}
 
-                directory.Synchronize();
-                Debug.WriteLine("End synch");
+                //directory.Synchronize();
+                //Debug.WriteLine("End synch");
 
-                foreach (var error in directory.Error)
-                {
-                    Debug.WriteLine(error);
-                }
+                //foreach (var error in directory.Error)
+                //{
+                //    Debug.WriteLine(error);
+                //}
             }
         }
     }
