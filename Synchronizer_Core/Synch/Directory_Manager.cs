@@ -126,11 +126,11 @@ namespace Synchronizer_Core
 
                     try
                     {
-                        dist_file = dist_files.First(d_inf => (d_inf == source_file));
+                        dist_file = dist_files.First(d_inf => (d_inf.Name == source_file.Name));
                     } catch (Exception) 
                     { }
 
-
+                    Console.WriteLine($"\t\tdist>>{(dist_file==null?"NULL":dist_file.FullName)}");
 
                     if (dist_file!=null)
                     {
@@ -166,6 +166,18 @@ namespace Synchronizer_Core
             
         }
         
+        public LinkedList<Managed_Data> Export_Data()
+        {
+            LinkedList < Managed_Data > export = new LinkedList<Managed_Data>();
 
+            foreach (Tuple<string,string> dir in dirs)
+            {
+                export.AddLast(
+                    new Managed_Data(dir.Item2,dir.Item1)
+                    );
+            }
+
+            return export;
+        }
     }
 }
