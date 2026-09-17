@@ -28,32 +28,31 @@ namespace Synchronizer_Core.Vault_Manager
             } else { throw new ArgumentException("File must exist!"); }
         }
 
-        public override LinkedList<Tuple<string, string>> Get()
+        public override LinkedList<Managed_Data> Get()
         {
             if (!JSON_Can_Open) { throw new MemberAccessException("You must turn me available path to json file"); }
             using (var file = File.Open(path, FileMode.Open))
             {
-                LinkedList<Tuple<string, string>>? res = JsonSerializer.Deserialize<LinkedList<Tuple<string, string>>>(file);
+                LinkedList<Managed_Data>? res = JsonSerializer.Deserialize<LinkedList<Managed_Data>>(file);
 
                 if (res == null) { throw new ArgumentException("Something wrong with file! List is null"); }
-                //JSON_File.Flush();
+                
                 return res;
             }
         }
 
-        public override void Save(LinkedList<Tuple<string, string>> list)
+        public override void Save(LinkedList<Managed_Data> list)
         {
             if (!JSON_Can_Open) { throw new MemberAccessException("You must turn me available path to json file"); }
 
-            Debug.WriteLine("To Save:");
-            foreach (var item in list) {
-                Debug.WriteLine($"{item.Item1} {item.Item2}");
-            }
+            //Debug.WriteLine("To Save:");
+            //foreach (var item in list) {
+            //    Debug.WriteLine($"{item.Source} > {item.Distination}");
+            //}
 
             using (var file = File.Open(path,FileMode.Open))
             {
-                JsonSerializer.Serialize<LinkedList<Tuple<string, string>>>(file, list);
-                //JSON_File.Flush();
+                JsonSerializer.Serialize<LinkedList<Managed_Data>>(file, list);
             }
         }
 
@@ -64,7 +63,7 @@ namespace Synchronizer_Core.Vault_Manager
             if (JSON_Can_Open) {
                 using (var file = File.Open(path, FileMode.Open))
                 {
-                    LinkedList<Tuple<string, string>>? res = JsonSerializer.Deserialize<LinkedList<Tuple<string, string>>>(file);
+                    LinkedList<Managed_Data>? res = JsonSerializer.Deserialize<LinkedList<Managed_Data>>(file);
 
                     if (res == null) { inf += $"\tCan`t desiralize"; }
                     else {

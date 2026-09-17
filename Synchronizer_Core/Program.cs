@@ -4,6 +4,19 @@ using Synchronizer_Core.Vault_Manager;
 using System.Collections.Generic;
 using System.Text.Json;
 
+var cur_dir = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory);
+//var cur_info = new DirectoryInfo(cur_dir);
+//cur_info.CreateSubdirectory("source");
+//cur_info.CreateSubdirectory("dist");
+
+Directory_Manager manager = new Directory_Manager();
+manager.Add_Path(
+    Path.Combine(cur_dir, "source"),
+    Path.Combine(cur_dir, "dist")
+    );
+
+manager.Synchronize();
+
 
 /*
  * Баловство с Яндекс - диском
@@ -57,7 +70,7 @@ foreach(var data in manage.Get())
 
 
 
-Directory_Manager  manager = new Directory_Manager();
+/*Directory_Manager  manager = new Directory_Manager();
 
 var source = @"C:\Users\Макс\Desktop\source\test_0.txt";
 var dist = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory), "dist", "test_0.txt");
@@ -68,5 +81,5 @@ manager.Synchronize();
 foreach(String str in manager.Error)
 {
     Console.WriteLine(str);
-}
+}*/
 
