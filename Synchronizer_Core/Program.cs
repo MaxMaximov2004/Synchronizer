@@ -15,7 +15,7 @@ manager.Add_Path(
     Path.Combine(cur_dir, "dist")
     );
 
-
+manager.Synchronize();
 
 
 /*

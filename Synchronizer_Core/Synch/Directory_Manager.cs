@@ -113,8 +113,57 @@ namespace Synchronizer_Core
 
         public void Synchronize(Manage_Type manage_type = Manage_Type.Standart)
         {
-        
-            throw new NotImplementedException("wORK in progress!");
+
+            foreach (Tuple<String, String> dir in dirs)
+            {
+                DirectoryInfo source = new DirectoryInfo(dir.Item1);
+                DirectoryInfo dist = new DirectoryInfo(dir.Item2);
+
+                FileInfo[] dist_files = dist.GetFiles();
+                foreach (FileInfo source_file in source.GetFiles())
+                {
+                    FileInfo? dist_file = null;
+
+                    try
+                    {
+                        dist_file = dist_files.First(d_inf => (d_inf == source_file));
+                    } catch (Exception) 
+                    { }
+
+
+
+                    if (dist_file!=null)
+                    {
+                        Console.WriteLine($"{source_file.FullName} <src|dst> {dist_file.FullName}");
+
+
+                        if (dist_file.LastWriteTime > source_file.LastWriteTime)
+                        {
+
+                            dist_file.CopyTo(source_file.FullName,true);
+                        } else
+                        {
+
+                            source_file.CopyTo(dist_file.FullName,true);
+                        }
+
+                    }
+                    else
+                    {
+                        Console.WriteLine($"{source_file.FullName} <src|dst> create new");
+
+                        
+                        source_file.CopyTo(
+                            Path.Combine(dist.FullName,source_file.Name),true);
+
+
+                    }
+
+
+
+                }
+            }
+            
         }
         
 
