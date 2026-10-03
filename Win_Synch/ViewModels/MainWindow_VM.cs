@@ -78,8 +78,8 @@ namespace Win_Synch.ViewModels
         public SimpleCommand Sync { get; set; }
         protected void exe_Sync(object? manager)
         {
-            Debug.WriteLine("execution");
-            /*JSON_Manager? json_manager = manager as JSON_Manager;
+            
+            JSON_Manager? json_manager = manager as JSON_Manager;
             if (json_manager != null)
             {
                 LinkedList<Managed_Data>? dir_list = null;
@@ -92,9 +92,9 @@ namespace Win_Synch.ViewModels
 
                 Manager = new Directory_Manager(dir_list);
                 Manager.Synchronize();
-                /*Тут же можно вынести в буфер ошибки полученные во время синхронизации/
+                /*Тут же можно вынести в буфер ошибки полученные во время синхронизации*/
 
-            }*/
+            }
         }
 
         protected bool can_exe_Sync(object? manager)
