@@ -28,6 +28,8 @@ namespace Synchronizer_Core.Vault_Manager
             } else { throw new ArgumentException("File must exist!"); }
         }
 
+        //Release method for delete file
+
         public override LinkedList<Managed_Data> Get()
         {
             if (!JSON_Can_Open) { throw new MemberAccessException("You must turn me available path to json file"); }
@@ -75,5 +77,6 @@ namespace Synchronizer_Core.Vault_Manager
 
             return inf;
         }
+    
     }
 }

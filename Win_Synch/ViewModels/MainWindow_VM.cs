@@ -49,7 +49,18 @@ namespace Win_Synch.ViewModels
                     {
                         JSON_Manager manager = new JSON_Manager();
                         manager.Open(file.FullName);
-                        Manage_Units.Add(manager);
+
+                        try
+                        {
+                            manager.Get();
+                            Manage_Units.Add(manager);
+
+                        }
+                        catch (Exception ex)
+                        {
+                            file.Delete();
+                        }
+
                     }
                 }
 

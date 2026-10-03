@@ -33,8 +33,9 @@
                 <MenuItem Header="Добавить синхронизируемый файл" />
                 <MenuItem Header="Добавить синхронизируемый папку" Click="MenuItem_Click"/>
             </MenuItem>
-            <MenuItem Header="DEBUG" Click="MenuItem_Click_1">
-                
+            <MenuItem Header="DEBUG">
+                <MenuItem Header="debug context" Click="MenuItem_Click_1" > </MenuItem>
+                <MenuItem Header="get errors" Click="MenuItem_Click_2"> </MenuItem>
             </MenuItem>
 
         </Menu>

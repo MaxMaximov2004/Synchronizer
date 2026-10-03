@@ -22,7 +22,7 @@ namespace Synchronizer_Core
     //Управляем только директориями, при синхронизации ищем файлы в директории и такие же в папки синхронизации
     public class Directory_Manager
     {
-        public LinkedList<String> Error { get; set; } = new LinkedList<string> { };
+        public LinkedList<String> Errors  { get; set; } = new LinkedList<string> { };
         protected LinkedList<Tuple<string, string>> dirs;
         //Item 1 = Source
         //Item 2 = Distination
@@ -34,9 +34,11 @@ namespace Synchronizer_Core
             foreach (Managed_Data path in data) { dirs.AddLast(Tuple.Create(path.Source,path.Distination)); }
         }
 
+
+
         // sync_path - папка которую необходимо синхронизировать
         // dist_path - папка в которой будет хранится синхронизируемая папка (вместе с версиями)
-        // Получение 2-ух директорий, проверка то что они существуют и настроука директории синхронизации
+        // Получение 2-ух директорий, проверка то что они существуют и настройка директории синхронизации
         public void Add_Path(String sync_path, String dist_path)
         {
 
@@ -130,31 +132,41 @@ namespace Synchronizer_Core
                     } catch (Exception) 
                     { }
 
-                    Console.WriteLine($"\t\tdist>>{(dist_file==null?"NULL":dist_file.FullName)}");
+                    //Console.WriteLine($"\t\tdist>>{(dist_file==null?"NULL":dist_file.FullName)}");
 
                     if (dist_file!=null)
                     {
-                        Console.WriteLine($"{source_file.FullName} <src|dst> {dist_file.FullName}");
+                        //Console.WriteLine($"{source_file.FullName} <src|dst> {dist_file.FullName}");
 
 
                         if (dist_file.LastWriteTime > source_file.LastWriteTime)
                         {
 
-                            dist_file.CopyTo(source_file.FullName,true);
+                            try {    dist_file.CopyTo(source_file.FullName, true);
+                            } catch (Exception ex) {
+                                Errors.AddLast($"{dist_file.FullName} >> {source_file.FullName}\nCatched: {ex.Message}");  }
+
                         } else
                         {
 
-                            source_file.CopyTo(dist_file.FullName,true);
+                            try {    source_file.CopyTo(dist_file.FullName, true);
+                            } catch (Exception ex) {
+                                Errors.AddLast($"{source_file.FullName } >> {dist_file.FullName}\nCatched: {ex.Message}");  }
                         }
 
                     }
                     else
                     {
-                        Console.WriteLine($"{source_file.FullName} <src|dst> create new");
+                        //Console.WriteLine($"{source_file.FullName} <src|dst> create new");
 
-                        
-                        source_file.CopyTo(
-                            Path.Combine(dist.FullName,source_file.Name),true);
+                        try {
+
+                            source_file.CopyTo(
+                                Path.Combine(dist.FullName, source_file.Name), true);
+                        } catch (Exception ex)
+                        {
+                            Errors.AddLast($"{source_file.FullName} >> create\n{ex.Message}");
+                        }
 
 
                     }

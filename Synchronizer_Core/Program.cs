@@ -4,18 +4,22 @@ using Synchronizer_Core.Vault_Manager;
 using System.Collections.Generic;
 using System.Text.Json;
 
-var cur_dir = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory);
-//var cur_info = new DirectoryInfo(cur_dir);
-//cur_info.CreateSubdirectory("source");
-//cur_info.CreateSubdirectory("dist");
 
-Directory_Manager manager = new Directory_Manager();
-manager.Add_Path(
-    Path.Combine(cur_dir, "source"),
-    Path.Combine(cur_dir, "dist")
-    );
+//Directory_Manager manage = new Directory_Manager();
+//manage.Add_Path();
 
-manager.Synchronize();
+//var cur_dir = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory);
+////var cur_info = new DirectoryInfo(cur_dir);
+////cur_info.CreateSubdirectory("source");
+////cur_info.CreateSubdirectory("dist");
+
+//Directory_Manager manager = new Directory_Manager();
+//manager.Add_Path(
+//    Path.Combine(cur_dir, "source"),
+//    Path.Combine(cur_dir, "dist")
+//    );
+
+//manager.Synchronize();
 
 
 /*

@@ -65,7 +65,7 @@ namespace Win_Synch
 
                     Directory_Manager directory_Manager = new Directory_Manager();
                     directory_Manager.Add_Path(new_source, new_dist);
-                    directory_Manager.Synchronize();
+                    //directory_Manager.Synchronize();
 
                     manager.Save(directory_Manager.Export_Data());
                     context.Manage_Units.Add(manager);
@@ -123,11 +123,27 @@ namespace Win_Synch
             }
         }
 
+        private void MenuItem_Click_2(object sender, RoutedEventArgs e)
+        {
+            var context = this.DataContext as MainWindow_VM;
+            if (context != null)
+            { 
+               
+                foreach(String err in context.Manager.Errors)
+                {
+                    Debug.WriteLine(err);
+                }
+            
+            }
+        }
+
         private void Button_Click(object sender, RoutedEventArgs e)//Синхронизация
         {
             
             JSON_Manager? item = (sender as Button).CommandParameter as JSON_Manager;
-            if(item != null)
+            var context = this.DataContext as MainWindow_VM;
+
+            if ((item != null)&&(context!=null))
             {
                 LinkedList<Managed_Data>? dir_list = null;
 
@@ -137,28 +153,29 @@ namespace Win_Synch
                 }
                 catch (Exception ex) { }
 
-                Directory_Manager manager = new Directory_Manager(dir_list);
-                manager.Synchronize();
+                //Directory_Manager manager = new Directory_Manager(dir_list);
+                //manager.Synchronize();
                 
-                //Debug.WriteLine("Beging synch");
+                context.Manager = new Directory_Manager(dir_list);
+                context.Manager.Synchronize();
 
+
+                //Debug.WriteLine("Beging synch");
                 //Directory_Manager directory = new Directory_Manager();
                 //LinkedList<Tuple<string, string>> files = item.Get();
-
-                
                 //foreach (var file in files) { 
                 //    directory.Add_Path(file.Item1, file.Item2);
                 //    Debug.WriteLine($"{file.Item1} <+> {file.Item2}");
                 //}
-
                 //directory.Synchronize();
                 //Debug.WriteLine("End synch");
-
                 //foreach (var error in directory.Error)
                 //{
                 //    Debug.WriteLine(error);
                 //}
             }
         }
+
+        
     }
 }
