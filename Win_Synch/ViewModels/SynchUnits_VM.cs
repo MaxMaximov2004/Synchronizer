@@ -1,6 +1,9 @@
 ﻿using System;
+using System.IO;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -52,7 +55,7 @@ namespace Win_Synch.ViewModels
             { 
                 Synch_Manager = new Directory_Synch(Vault_Manager.Get());
                 Sync = new SimpleCommand(exe_Sync, can_exe_Sync);
-            }
+            } 
         }
 
         /*public event PropertyChangedEventHandler? PropertyChanged;
@@ -67,12 +70,57 @@ namespace Win_Synch.ViewModels
 
         protected void exe_Sync(object? manager)
         {
-
+            //Debug.WriteLine($"Vault val: {Vault_Manager}, Synch val: {Synch_Manager}");
             Synch_Manager?.Synchronize();
         }
         protected bool can_exe_Sync(object? manager)
         {
+            //return (Synch_Manager == null); //Что-то не понятное, почему-то считает что Synch_Manager не существует
             return true;
+        }
+    }
+
+
+    //Необходимые данные для создания новой еденицы синхронизации
+    public class NewSynchUnits_VM 
+    {
+        public String? Name { get; set; } = "Укажите имя";
+        public String? Source_Fold { get; set; } = null;
+        public String? Destination_Fold { get; set; } = null;
+
+        protected ObservableCollection<SynchUnits_VM> Manage_Units;
+
+        public NewSynchUnits_VM(ObservableCollection<SynchUnits_VM> manage_units) { 
+
+            Manage_Units = manage_units; 
+            
+        }
+
+        /*Комманды*/
+        public SimpleCommand Save_data { get; set; }
+        protected void save(object? obj)
+        {
+            //some magic with close window
+        }
+        protected bool can_save(object? obj)
+        {
+            return (Name!=null)&&(Name.Count()>0)&&(Name.Contains(String.Concat(Path.GetInvalidFileNameChars())))
+                &&(Source_Fold!=null)&&(Directory.Exists(Source_Fold))
+                &&(Destination_Fold!=null)&&(Directory.Exists(Destination_Fold));
+        }
+
+
+        public SimpleCommand Select_Source { get; set; }
+        protected void select_source(object? obj)
+        {
+
+        }
+
+
+        public SimpleCommand Select_Destination { get; set; }
+        protected void select_distination(object? obj)
+        {
+
         }
     }
 }
