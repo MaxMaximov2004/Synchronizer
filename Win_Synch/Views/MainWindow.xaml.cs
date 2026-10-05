@@ -63,7 +63,7 @@ namespace Win_Synch
                         manager.Open(path);
                     }
 
-                    Directory_Manager directory_Manager = new Directory_Manager();
+                    Directory_Synch directory_Manager = new Directory_Synch();
                     directory_Manager.Add_Path(new_source, new_dist);
                     //directory_Manager.Synchronize();
 
@@ -121,7 +121,7 @@ namespace Win_Synch
                 }
                 catch (Exception ex) { }
                 
-                context.Manager = new Directory_Manager(dir_list);
+                context.Manager = new Directory_Synch(dir_list);
                 context.Manager.Synchronize();
 
 

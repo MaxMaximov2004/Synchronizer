@@ -23,7 +23,7 @@ namespace Win_Synch.ViewModels
 
 
         public ObservableCollection<JSON_Manager> Manage_Units { get; set; }
-        public Directory_Manager Manager { get; set; }
+        public Directory_Synch Manager { get; set; }
 
 
         //path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonDocuments), "Win_Synch", "Data.txt")
@@ -32,7 +32,7 @@ namespace Win_Synch.ViewModels
             path_data = path;
             path_working_dir = Path.GetDirectoryName(path) ?? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonDocuments), "Win_Synch");
             Manage_Units = new ObservableCollection<JSON_Manager>();
-            Manager = new Directory_Manager();
+            Manager = new Directory_Synch();
 
             Sync = new SimpleCommand(exe_Sync, can_exe_Sync);
 
@@ -90,7 +90,7 @@ namespace Win_Synch.ViewModels
                 }
                 catch (Exception ex) { }
 
-                Manager = new Directory_Manager(dir_list);
+                Manager = new Directory_Synch(dir_list);
                 Manager.Synchronize();
                 /*Тут же можно вынести в буфер ошибки полученные во время синхронизации*/
 

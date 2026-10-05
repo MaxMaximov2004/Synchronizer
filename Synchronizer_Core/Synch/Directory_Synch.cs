@@ -8,7 +8,7 @@ using System.IO;
 using Synchronizer_Core.Vault_Manager;
 using System.Diagnostics;
 
-namespace Synchronizer_Core
+namespace Synchronizer_Core.Synch
 {
     public enum Manage_Type:byte 
     {
@@ -20,15 +20,15 @@ namespace Synchronizer_Core
 
 
     //Управляем только директориями, при синхронизации ищем файлы в директории и такие же в папки синхронизации
-    public class Directory_Manager
+    public class Directory_Synch:ISynch
     {
         public LinkedList<String> Errors  { get; set; } = new LinkedList<string> { };
         protected LinkedList<Tuple<string, string>> dirs;
         //Item 1 = Source
         //Item 2 = Distination
 
-        public Directory_Manager() { dirs = new LinkedList<Tuple<string, string>>();    }
-        public Directory_Manager(LinkedList<Managed_Data> data) {
+        public Directory_Synch() { dirs = new LinkedList<Tuple<string, string>>();    }
+        public Directory_Synch(LinkedList<Managed_Data> data) {
 
             dirs = new LinkedList<Tuple<string, string>>();
             foreach (Managed_Data path in data) { dirs.AddLast(Tuple.Create(path.Source,path.Distination)); }
@@ -132,13 +132,10 @@ namespace Synchronizer_Core
                     } catch (Exception) 
                     { }
 
-                    //Console.WriteLine($"\t\tdist>>{(dist_file==null?"NULL":dist_file.FullName)}");
-
+                    
                     if (dist_file!=null)
                     {
-                        //Console.WriteLine($"{source_file.FullName} <src|dst> {dist_file.FullName}");
-
-
+                        
                         if (dist_file.LastWriteTime > source_file.LastWriteTime)
                         {
 
@@ -157,8 +154,7 @@ namespace Synchronizer_Core
                     }
                     else
                     {
-                        //Console.WriteLine($"{source_file.FullName} <src|dst> create new");
-
+                        
                         try {
 
                             source_file.CopyTo(
@@ -167,8 +163,6 @@ namespace Synchronizer_Core
                         {
                             Errors.AddLast($"{source_file.FullName} >> create\n{ex.Message}");
                         }
-
-
                     }
 
 
