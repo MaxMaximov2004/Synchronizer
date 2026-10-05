@@ -28,10 +28,10 @@ namespace Synchronizer_Core.Synch
         //Item 2 = Distination
 
         public Directory_Synch() { dirs = new LinkedList<Tuple<string, string>>();    }
-        public Directory_Synch(LinkedList<Managed_Data> data) {
+        public Directory_Synch(LinkedList<Managed_Data> trusted_data) {
 
             dirs = new LinkedList<Tuple<string, string>>();
-            foreach (Managed_Data path in data) { dirs.AddLast(Tuple.Create(path.Source,path.Distination)); }
+            foreach (Managed_Data path in trusted_data) { dirs.AddLast(Tuple.Create(path.Source,path.Distination)); }
         }
 
 

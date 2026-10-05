@@ -22,7 +22,7 @@
                         <DataTemplate>
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock Text="{Binding Name}"/>
-                                <Button Command="{Binding DataContext.Sync}" CommandParameter="{Binding}">Синхронизировать</Button>
+                                <Button Command="{Binding Sync}" CommandParameter="{Binding}">Синхронизировать</Button>
                             </StackPanel>
                         </DataTemplate>
 
