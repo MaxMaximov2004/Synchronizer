@@ -18,9 +18,9 @@ namespace Win_Synch.Views
     /// <summary>
     /// Логика взаимодействия для Window1.xaml
     /// </summary>
-    public partial class Window1 : Window
+    public partial class NewSynchUnits_V : Window
     {
-        public Window1(SynchUnits_VM context)
+        public NewSynchUnits_V(SynchUnits_VM context)
         {
             InitializeComponent();
             DataContext = context;

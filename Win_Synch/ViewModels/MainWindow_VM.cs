@@ -14,6 +14,7 @@ using System.Threading.Tasks;
 using System.Windows.Controls;
 
 using Win_Synch.Commands;
+using Win_Synch.Views;
 
 namespace Win_Synch.ViewModels
 {
@@ -29,6 +30,15 @@ namespace Win_Synch.ViewModels
         public ObservableCollection<SynchUnits_VM> Manage_Units { get; set; }
         public Directory_Synch Manager { get; set; }
 
+        /*Комманды*/
+        public SimpleCommand Create_Manage_Units { get; set; }
+        protected void create_manage_units(object? obj)
+        {
+            NewSynchUnits_VM new_unit = new NewSynchUnits_VM(path_working_dir);
+            NewSynchUnits_V window = new NewSynchUnits_V(new_unit);
+            window.Show();
+            Manage_Units.Add(new_unit);нной папке
+        }
 
         //path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonDocuments), "Win_Synch", "Data.txt")
         public MainWindow_VM(string path)
@@ -38,6 +48,7 @@ namespace Win_Synch.ViewModels
             Manage_Units = new ObservableCollection<SynchUnits_VM>();
             Manager = new Directory_Synch();
 
+            Create_Manage_Units = new SimpleCommand(create_manage_units, (object? obj) => { return true; });
             
 
             if (!File.Exists(path))
@@ -78,10 +89,6 @@ namespace Win_Synch.ViewModels
             
         }
 
-
-        
-
-        public SimpleCommand Create_Fold { get; set; }
     
     }
 }

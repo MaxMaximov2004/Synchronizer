@@ -31,7 +31,7 @@
             </MenuItem>
             <MenuItem Header="Добавить еденицу синхронизации">
                 <MenuItem Header="Добавить синхронизируемый файл" />
-                <MenuItem Header="Добавить синхронизируемый папку" Click="MenuItem_Click"/>
+                <MenuItem Header="Добавить синхронизируемый папку" Command="{Binding Create_Manage_Units}"/>
             </MenuItem>
             <MenuItem Header="DEBUG">
                 <MenuItem Header="debug context" Click="MenuItem_Click_1" > </MenuItem>
