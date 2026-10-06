@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Synchronizer_Core
 {
-    public class YD_director
+    public class YD_Synch
     {
     }
 }

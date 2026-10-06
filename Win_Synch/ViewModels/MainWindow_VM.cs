@@ -1,5 +1,7 @@
 ﻿using Synchronizer_Core;
 using Synchronizer_Core.Vault_Manager;
+using Synchronizer_Core.Synch;
+
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -10,7 +12,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Controls;
+
 using Win_Synch.Commands;
+using Win_Synch.Views;
 
 namespace Win_Synch.ViewModels
 {
@@ -22,19 +26,30 @@ namespace Win_Synch.ViewModels
         public string path_working_dir = ""; //рабочая директория для создания Json-файлов
 
 
-        public ObservableCollection<JSON_Manager> Manage_Units { get; set; }
-        public Directory_Manager Manager { get; set; }
 
+        public ObservableCollection<SynchUnits_VM> Manage_Units { get; set; }
+        public Directory_Synch Manager { get; set; }
+
+        /*Комманды*/
+        public SimpleCommand Create_Manage_Units { get; set; }
+        protected void create_manage_units(object? obj)
+        {
+            NewSynchUnits_VM new_unit = new NewSynchUnits_VM(path_working_dir);
+            NewSynchUnits_V window = new NewSynchUnits_V(new_unit);
+            window.Show();
+            Manage_Units.Add(new_unit);нной папке
+        }
 
         //path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonDocuments), "Win_Synch", "Data.txt")
         public MainWindow_VM(string path)
         {
             path_data = path;
             path_working_dir = Path.GetDirectoryName(path) ?? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonDocuments), "Win_Synch");
-            Manage_Units = new ObservableCollection<JSON_Manager>();
-            Manager = new Directory_Manager();
+            Manage_Units = new ObservableCollection<SynchUnits_VM>();
+            Manager = new Directory_Synch();
 
-            Sync = new SimpleCommand(exe_Sync, can_exe_Sync);
+            Create_Manage_Units = new SimpleCommand(create_manage_units, (object? obj) => { return true; });
+            
 
             if (!File.Exists(path))
             {
@@ -57,7 +72,8 @@ namespace Win_Synch.ViewModels
                         try
                         {
                             manager.Get();
-                            Manage_Units.Add(manager);
+
+                            Manage_Units.Add(new SynchUnits_VM(file.FullName));
 
                         }
                         catch (Exception ex)
@@ -73,36 +89,6 @@ namespace Win_Synch.ViewModels
             
         }
 
-
-        /*Используемые команды*/
-        public SimpleCommand Sync { get; set; }
-        protected void exe_Sync(object? manager)
-        {
-            Debug.WriteLine("execution");
-            /*JSON_Manager? json_manager = manager as JSON_Manager;
-            if (json_manager != null)
-            {
-                LinkedList<Managed_Data>? dir_list = null;
-
-                try
-                {
-                    dir_list = json_manager.Get();
-                }
-                catch (Exception ex) { }
-
-                Manager = new Directory_Manager(dir_list);
-                Manager.Synchronize();
-                /*Тут же можно вынести в буфер ошибки полученные во время синхронизации/
-
-            }*/
-        }
-
-        protected bool can_exe_Sync(object? manager)
-        {
-            return true;
-        }
-
-        public SimpleCommand Create_Fold { get; set; }
     
     }
 }
