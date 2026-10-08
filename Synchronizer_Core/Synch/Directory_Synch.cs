@@ -146,7 +146,7 @@ namespace Synchronizer_Core.Synch
                 Errors.AddLast(ex.Message);
             }
         }
-        
+        //Создаёт файл в другой папке если его там нет
         protected void synch_files(FileInfo from, DirectoryInfo to)
         {
             if ((from == null) || (to == null))
@@ -245,7 +245,7 @@ namespace Synchronizer_Core.Synch
 
                             /*Находим файлы в хранилище и перемещаем их в рабочую папку*/
                             var new_dist_files = from dist_file in dist_files
-                                                 where source_files.Any(s_f=>s_f.Name != dist_file.Name)
+                                                 where !source_files.Any(s_f=>s_f.Name == dist_file.Name)
                                                  select dist_file;
 
                             foreach (var file in new_dist_files)
@@ -269,7 +269,7 @@ namespace Synchronizer_Core.Synch
 
                             /*Находим файлы в рабочей папке и перемещаем их в хранилище*/
                             var new_source_files = from source_file in source_files
-                                                 where dist_files.Any(d_f=>d_f.Name!=source_file.Name)
+                                                 where !dist_files.Any(d_f=>d_f.Name==source_file.Name)
                                                  select source_file;
 
                             foreach (var file in new_source_files)
@@ -292,7 +292,7 @@ namespace Synchronizer_Core.Synch
 
 
                             var new_dist_files = from dist_file in dist_files
-                                                 where source_files.Any(s_f => s_f.Name != dist_file.Name)
+                                                 where !source_files.Any(s_f => s_f.Name == dist_file.Name)
                                                  select dist_file;
 
                             foreach (var file in new_dist_files)
@@ -301,7 +301,7 @@ namespace Synchronizer_Core.Synch
                             }
 
                             var new_source_files = from source_file in source_files
-                                                   where dist_files.Any(d_f => d_f.Name != source_file.Name)
+                                                   where !dist_files.Any(d_f => d_f.Name == source_file.Name)
                                                    select source_file;
 
                             foreach (var file in new_source_files)
