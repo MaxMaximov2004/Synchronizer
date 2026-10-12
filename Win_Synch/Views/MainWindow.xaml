@@ -23,6 +23,7 @@
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock Text="{Binding Name}"/>
                                 <Button Command="{Binding Sync}" CommandParameter="{Binding}">Синхронизировать</Button>
+                                <Button > Посмотреть ошибки </Button>
                             </StackPanel>
                         </DataTemplate>
 

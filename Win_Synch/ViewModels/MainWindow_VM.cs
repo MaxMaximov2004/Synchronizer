@@ -1,25 +1,35 @@
 ﻿using Synchronizer_Core;
-using Synchronizer_Core.Vault_Manager;
 using Synchronizer_Core.Synch;
-
+using Synchronizer_Core.Vault_Manager;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Diagnostics.Contracts;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Controls;
-
 using Win_Synch.Commands;
 using Win_Synch.Views;
 
 namespace Win_Synch.ViewModels
 {
-    public class MainWindow_VM
-    { 
+    public class MainWindow_VM: INotifyPropertyChanged
+    {
+        
+        public event PropertyChangedEventHandler? PropertyChanged;
+        public void OnPropertyChanged([CallerMemberName] string prop = "")
+        {
+            if (PropertyChanged != null)
+                PropertyChanged(this, new PropertyChangedEventArgs(prop));
+        }
+
+
+
         protected string path_data = ""; //файл данных, что-бы был
         
         //P.S. убрать модификатор public после искоренения всех обработчиков!!! НЕ ЗАБЫТЬ ПРО ЭТО!!!
@@ -28,7 +38,10 @@ namespace Win_Synch.ViewModels
 
 
         public ObservableCollection<SynchUnits_VM> Manage_Units { get; set; }
-        public Directory_Synch Manager { get; set; }
+
+        protected SynchUnits_VM? selected_unit = null;
+        public SynchUnits_VM? Selected_Unit { get { OnPropertyChanged(); return selected_unit; } set { OnPropertyChanged(); selected_unit = value; } }
+        
 
         /*Комманды*/
         public SimpleCommand Create_Manage_Units { get; set; }
@@ -37,7 +50,7 @@ namespace Win_Synch.ViewModels
             NewSynchUnits_VM new_unit = new NewSynchUnits_VM(path_working_dir);
             NewSynchUnits_V window = new NewSynchUnits_V(new_unit);
             window.Show();
-            Manage_Units.Add(new_unit);нной папке
+            Manage_Units.Add(new_unit);
         }
 
         //path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonDocuments), "Win_Synch", "Data.txt")
@@ -46,7 +59,7 @@ namespace Win_Synch.ViewModels
             path_data = path;
             path_working_dir = Path.GetDirectoryName(path) ?? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonDocuments), "Win_Synch");
             Manage_Units = new ObservableCollection<SynchUnits_VM>();
-            Manager = new Directory_Synch();
+            
 
             Create_Manage_Units = new SimpleCommand(create_manage_units, (object? obj) => { return true; });
             
@@ -59,8 +72,6 @@ namespace Win_Synch.ViewModels
 
             } else
             {
-                
-
                 /*сканер рабочей папки на наличие json файлов едениц синхронизации*/
                 foreach (var file in new DirectoryInfo(path_working_dir).EnumerateFiles()) {
 
@@ -84,6 +95,7 @@ namespace Win_Synch.ViewModels
                     }
                 }
 
+                if (Manage_Units.Count > 0) { Selected_Unit = Manage_Units.ElementAt(0); }
             }
 
             
