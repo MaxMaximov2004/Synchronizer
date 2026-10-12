@@ -41,7 +41,7 @@ namespace Win_Synch.ViewModels
             передаём название файла отслеживаемый папок, потом в конструкторе понимаем какое множество синхронизаторов можно применить к этим папкам
          */
         
-        public SynchUnits_VM(string path_json, select? slct = null)
+        public SynchUnits_VM(string path_json)
         {
 
             Vault_Manager = new JSON_Manager();
@@ -61,7 +61,7 @@ namespace Win_Synch.ViewModels
             } 
         }
 
-        protected SynchUnits_VM(select? slct = null) { Sync = new SimpleCommand(exe_Sync, can_exe_Sync); main_window_selector = slct; }
+        protected SynchUnits_VM() { Sync = new SimpleCommand(exe_Sync, can_exe_Sync); }
         protected void Init(string path_json, string source, string distination)
         {
 
@@ -99,11 +99,8 @@ namespace Win_Synch.ViewModels
         
     }
 
-        virtual protected bool can_exe_Select(object? manager)
-        {
-            return main_window_selector == null;
-        }
-    }
+      
+    
 
 
     //Необходимые данные для создания новой еденицы синхронизации
@@ -139,7 +136,7 @@ namespace Win_Synch.ViewModels
         //    Manage_Units = manage_units; 
         //}
 
-        public NewSynchUnits_VM(string work_dir, select slct) {
+        public NewSynchUnits_VM(string work_dir) {
 
             dir = work_dir;
            
