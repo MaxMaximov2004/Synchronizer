@@ -16,11 +16,11 @@ using Win_Synch.Commands;
 
 namespace Win_Synch.ViewModels
 {
+    
     public class SynchUnits_VM
     {
         public ISynch? Synch_Manager { get; set; } = null;
         public Vault_Manager? Vault_Manager { get; set; } = null;
-
         public string Name { 
             get {
 
@@ -34,6 +34,7 @@ namespace Win_Synch.ViewModels
                 }
             } 
         }
+       
 
         /*
          * Пока что так, обязательно сделать конструктор более гибким:
@@ -42,6 +43,7 @@ namespace Win_Synch.ViewModels
         
         public SynchUnits_VM(string path_json)
         {
+
             Vault_Manager = new JSON_Manager();
             
             try
@@ -82,7 +84,6 @@ namespace Win_Synch.ViewModels
 
         /*Используемые команды*/
         public SimpleCommand Sync { get; set; }
-
         virtual protected void exe_Sync(object? manager)
         {
             //Debug.WriteLine($"Vault val: {Vault_Manager}, Synch val: {Synch_Manager}");
@@ -93,7 +94,13 @@ namespace Win_Synch.ViewModels
             //return (Synch_Manager == null); //Что-то не понятное, почему-то считает что Synch_Manager не существует
             return true;
         }
+        
+
+        
     }
+
+      
+    
 
 
     //Необходимые данные для создания новой еденицы синхронизации
@@ -106,6 +113,7 @@ namespace Win_Synch.ViewModels
                 PropertyChanged(this, new PropertyChangedEventArgs(prop));
         }
 
+
         protected string dir;
 
         protected string name = "Укажите имя";
@@ -117,6 +125,7 @@ namespace Win_Synch.ViewModels
         protected string? destination_fold = null;
         public String? Destination_Fold { get { return destination_fold; } set { destination_fold = value; OnPropertyChanged(); } }
 
+        
         /*
          Для варианта если это не класс - наследник SynchUnits_VM - 
             те при создании мы вызваем его View в конструкторе которого вызывается и этот конструктор ViewModel, 
@@ -130,7 +139,7 @@ namespace Win_Synch.ViewModels
         public NewSynchUnits_VM(string work_dir) {
 
             dir = work_dir;
-            
+           
 
             Save_data = new SimpleCommand(save, can_save);
             Select_Source = new SimpleCommand(select_source, (object? obj) => { return true; });
@@ -142,10 +151,6 @@ namespace Win_Synch.ViewModels
         protected void save(object? obj)
         {
             //some magic with close window
-
-            //Debug.WriteLine(Name);
-            //Debug.WriteLine(Source_Fold);
-            //Debug.WriteLine(Destination_Fold);
             base.Init(Path.Combine(dir, (name.EndsWith(".json") ? name : name+".json") ), source_fold, destination_fold);
             Debug.WriteLine("base Init!");
         }
