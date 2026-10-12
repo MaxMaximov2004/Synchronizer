@@ -16,11 +16,12 @@ using Win_Synch.Commands;
 
 namespace Win_Synch.ViewModels
 {
+    public delegate void select(SynchUnits_VM unit);
+
     public class SynchUnits_VM
     {
         public ISynch? Synch_Manager { get; set; } = null;
         public Vault_Manager? Vault_Manager { get; set; } = null;
-
         public string Name { 
             get {
 
@@ -34,14 +35,17 @@ namespace Win_Synch.ViewModels
                 }
             } 
         }
+        protected select? main_window_selector=null;
 
         /*
          * Пока что так, обязательно сделать конструктор более гибким:
             передаём название файла отслеживаемый папок, потом в конструкторе понимаем какое множество синхронизаторов можно применить к этим папкам
          */
         
-        public SynchUnits_VM(string path_json)
+        public SynchUnits_VM(string path_json, select? slct = null)
         {
+            main_window_selector = slct;
+
             Vault_Manager = new JSON_Manager();
             
             try
@@ -59,7 +63,7 @@ namespace Win_Synch.ViewModels
             } 
         }
 
-        protected SynchUnits_VM() { Sync = new SimpleCommand(exe_Sync, can_exe_Sync); }
+        protected SynchUnits_VM(select? slct = null) { Sync = new SimpleCommand(exe_Sync, can_exe_Sync); main_window_selector = slct; }
         protected void Init(string path_json, string source, string distination)
         {
 
@@ -82,7 +86,6 @@ namespace Win_Synch.ViewModels
 
         /*Используемые команды*/
         public SimpleCommand Sync { get; set; }
-
         virtual protected void exe_Sync(object? manager)
         {
             //Debug.WriteLine($"Vault val: {Vault_Manager}, Synch val: {Synch_Manager}");
@@ -92,6 +95,18 @@ namespace Win_Synch.ViewModels
         {
             //return (Synch_Manager == null); //Что-то не понятное, почему-то считает что Synch_Manager не существует
             return true;
+        }
+        
+
+        public SimpleCommand Select { get; set; }
+        virtual protected void exe_Select(object? manager)
+        {
+            main_window_selector.Invoke(this);
+        }
+
+        virtual protected bool can_exe_Select(object? manager)
+        {
+            return main_window_selector == null;
         }
     }
 
@@ -106,6 +121,7 @@ namespace Win_Synch.ViewModels
                 PropertyChanged(this, new PropertyChangedEventArgs(prop));
         }
 
+
         protected string dir;
 
         protected string name = "Укажите имя";
@@ -117,6 +133,7 @@ namespace Win_Synch.ViewModels
         protected string? destination_fold = null;
         public String? Destination_Fold { get { return destination_fold; } set { destination_fold = value; OnPropertyChanged(); } }
 
+        
         /*
          Для варианта если это не класс - наследник SynchUnits_VM - 
             те при создании мы вызваем его View в конструкторе которого вызывается и этот конструктор ViewModel, 
@@ -127,10 +144,10 @@ namespace Win_Synch.ViewModels
         //    Manage_Units = manage_units; 
         //}
 
-        public NewSynchUnits_VM(string work_dir) {
+        public NewSynchUnits_VM(string work_dir, select slct) {
 
             dir = work_dir;
-            
+            base.main_window_selector = slct;
 
             Save_data = new SimpleCommand(save, can_save);
             Select_Source = new SimpleCommand(select_source, (object? obj) => { return true; });
@@ -142,10 +159,6 @@ namespace Win_Synch.ViewModels
         protected void save(object? obj)
         {
             //some magic with close window
-
-            //Debug.WriteLine(Name);
-            //Debug.WriteLine(Source_Fold);
-            //Debug.WriteLine(Destination_Fold);
             base.Init(Path.Combine(dir, (name.EndsWith(".json") ? name : name+".json") ), source_fold, destination_fold);
             Debug.WriteLine("base Init!");
         }

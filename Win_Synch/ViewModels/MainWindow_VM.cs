@@ -47,7 +47,7 @@ namespace Win_Synch.ViewModels
         public SimpleCommand Create_Manage_Units { get; set; }
         protected void create_manage_units(object? obj)
         {
-            NewSynchUnits_VM new_unit = new NewSynchUnits_VM(path_working_dir);
+            NewSynchUnits_VM new_unit = new NewSynchUnits_VM(path_working_dir, (SynchUnits_VM obj) => { Selected_Unit = obj; });
             NewSynchUnits_V window = new NewSynchUnits_V(new_unit);
             window.Show();
             Manage_Units.Add(new_unit);

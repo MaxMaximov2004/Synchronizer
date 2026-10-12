@@ -95,16 +95,17 @@ namespace Win_Synch
 
         private void MenuItem_Click_2(object sender, RoutedEventArgs e)//Отладка
         {
-            var context = this.DataContext as MainWindow_VM;
-            if (context != null)
-            { 
-               
-                foreach(String err in context.Manager.Errors)
-                {
-                    Debug.WriteLine(err);
-                }
-            
-            }
+            Debug.WriteLine("Не работает этоот метод!");
+            //var context = this.DataContext as MainWindow_VM;
+            //if (context != null)
+            //{ 
+
+            //    foreach(String err in context.Manager.Errors)
+            //    {
+            //        Debug.WriteLine(err);
+            //    }
+
+            //}
         }
 
 

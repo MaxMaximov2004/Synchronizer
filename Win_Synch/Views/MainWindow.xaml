@@ -23,7 +23,7 @@
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock Text="{Binding Name}"/>
                                 <Button Command="{Binding Sync}" CommandParameter="{Binding}">Синхронизировать</Button>
-                                <Button > Посмотреть ошибки </Button>
+                                <Button Command="{Binding Select}"> Посмотреть информацию </Button>
                             </StackPanel>
                         </DataTemplate>
 
@@ -41,5 +41,14 @@
 
         </Menu>
 
+        <StackPanel Grid.Row="1" Orientation="Vertical">
+            
+            <Label Content="{Binding Selected_Unit.Name}"></Label>
+            <Label> Ошибки: </Label>
+            <ListBox ItemsSource="{Binding Selected_Unit.Vault_Manager.Errors}">
+            </ListBox>
+            
+        </StackPanel>
+        
     </Grid>
 </Window>
