@@ -40,7 +40,7 @@ namespace Win_Synch.ViewModels
         public ObservableCollection<SynchUnits_VM> Manage_Units { get; set; }
 
         protected SynchUnits_VM? selected_unit = null;
-        public SynchUnits_VM? Selected_Unit { get { OnPropertyChanged(); return selected_unit; } set { OnPropertyChanged(); selected_unit = value; } }
+        public SynchUnits_VM? Selected_Unit { get { /*Debug.WriteLine("Getted");*/ return selected_unit; } set { /*Debug.WriteLine("Setted"); */ selected_unit = value; OnPropertyChanged(); } }
         
 
         /*Комманды*/

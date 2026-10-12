@@ -16,14 +16,14 @@
         
         <Menu Grid.Row="0">
             <MenuItem Header="Синхронизировать еденицу">
-                <ListBox ItemsSource="{Binding Manage_Units}">
+                <ListBox ItemsSource="{Binding Manage_Units}" SelectedItem="{Binding Selected_Unit, UpdateSourceTrigger=PropertyChanged}">
                     <ListBox.ItemTemplate>
 
                         <DataTemplate>
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock Text="{Binding Name}"/>
                                 <Button Command="{Binding Sync}" CommandParameter="{Binding}">Синхронизировать</Button>
-                                <Button > Посмотреть ошибки </Button>
+                                <!--<Button Command="{Binding Select}"> Посмотреть информацию </Button>-->
                             </StackPanel>
                         </DataTemplate>
 
@@ -41,5 +41,14 @@
 
         </Menu>
 
+        <StackPanel Grid.Row="1" Orientation="Vertical" Margin="5,5,5,5">
+
+            <Label Content="{Binding Selected_Unit.Name, UpdateSourceTrigger=PropertyChanged}"></Label>
+            <Label> Ошибки: </Label>
+            <ListBox ItemsSource="{Binding Selected_Unit.Synch_Manager.Errors, UpdateSourceTrigger=PropertyChanged}">
+            </ListBox>
+            
+        </StackPanel>
+        
     </Grid>
 </Window>
