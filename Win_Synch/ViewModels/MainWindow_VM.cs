@@ -14,6 +14,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Controls;
 using Win_Synch.Commands;
+using Win_Synch.ViewModels.SynchUnits;
 using Win_Synch.Views;
 
 namespace Win_Synch.ViewModels

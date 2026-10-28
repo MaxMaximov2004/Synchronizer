@@ -11,7 +11,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
-using Win_Synch.ViewModels;
+using Win_Synch.ViewModels.SynchUnits;
 
 namespace Win_Synch.Views
 {
