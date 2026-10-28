@@ -21,11 +21,49 @@ namespace Win_Synch.ViewModels.SynchUnits
     {
         public Vault_Manager? Vault_Manager { get; set; } = null;
 
-        public override string Name { get { return Name;  } set { Name = value; base.OnPropertyChanged(); } }
 
-        public override SimpleCommand Sync { get { return Sync; } protected set { Sync = value; base.OnPropertyChanged(); } }
+        private string _name = "NULL :(";
+        private SimpleCommand _sync;
+        private ISynch? _synchManager;
 
-        public override ISynch? Synch_Manager { get { return Synch_Manager; } protected set { Synch_Manager = value; base.OnPropertyChanged(); } }
+        public override string Name
+        {
+            get { return _name; }
+            set
+            {
+                if (_name != value)
+                {
+                    _name = value;
+                    base.OnPropertyChanged();
+                }
+            }
+        }
+
+        public override SimpleCommand Sync
+        {
+            get { return _sync; }
+            protected set
+            {
+                if (_sync != value)
+                {
+                    _sync = value;
+                    base.OnPropertyChanged();
+                }
+            }
+        }
+
+        public override ISynch? Synch_Manager
+        {
+            get { return _synchManager; }
+            protected set
+            {
+                if (_synchManager != value)
+                {
+                    _synchManager = value;
+                    base.OnPropertyChanged();
+                }
+            }
+        }
 
 
 
@@ -48,23 +86,25 @@ namespace Win_Synch.ViewModels.SynchUnits
             }
 
             if (Vault_Manager != null) 
-            { 
-                Synch_Manager = new Directory_Synch(Vault_Manager.Get());
-                Sync = new SimpleCommand(exe_Sync, can_exe_Sync);
+            {
+                _synchManager = new Directory_Synch(Vault_Manager.Get());
+                _sync = new SimpleCommand(exe_Sync, can_exe_Sync);
+                _name = Path.GetFileName(path_json);
             } 
         }
 
-        protected SynchUnits_VM() { Sync = new SimpleCommand(exe_Sync, can_exe_Sync); }
+        protected SynchUnits_VM() { _sync = new SimpleCommand(exe_Sync, can_exe_Sync); }
         protected void Init(string path_json, string source, string distination)
         {
 
-            Synch_Manager = new Directory_Synch();
-            Synch_Manager.Add_Path(source, distination);
+            _synchManager = new Directory_Synch();
+            _synchManager.Add_Path(source, distination);
 
+            _name = Path.GetFileName(path_json);
             Vault_Manager = new JSON_Manager();
             File.Create(path_json).Close();
             ((JSON_Manager)Vault_Manager).Open(path_json);
-            ((JSON_Manager)Vault_Manager).Save(Synch_Manager.Export_Data());
+            ((JSON_Manager)Vault_Manager).Save(_synchManager.Export_Data());
 
         }
 

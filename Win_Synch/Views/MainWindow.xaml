@@ -15,7 +15,7 @@
         
         
         <Menu Grid.Row="0">
-            <MenuItem Header="Синхронизировать еденицу">
+            <MenuItem Header="Отслеживаемые еденицы синхронизации">
                 <ListBox ItemsSource="{Binding Manage_Units}" SelectedItem="{Binding Selected_Unit, UpdateSourceTrigger=PropertyChanged}">
                     <ListBox.ItemTemplate>
 
@@ -41,7 +41,7 @@
 
         </Menu>
 
-        <StackPanel Grid.Row="1" Orientation="Vertical" Margin="5,5,5,5">
+        <StackPanel x:Name="WorkField" Grid.Row="1" Orientation="Vertical" Margin="5,5,5,5">
 
             <Label Content="{Binding Selected_Unit.Name, UpdateSourceTrigger=PropertyChanged}"></Label>
             <Label> Ошибки: </Label>
