@@ -10,7 +10,7 @@ namespace Synchronizer_Core.Synch
     public interface ISynch
     {
         public void Add_Path(String sync_path, String dist_path);
-        public void Synchronize(Manage_Type manage_type = Manage_Type.Standart);
+        public void Synchronize(Manage_Type manage_type = Manage_Type.Join);
 
         public LinkedList<Managed_Data> Export_Data();
     }

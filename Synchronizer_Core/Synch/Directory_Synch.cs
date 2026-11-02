@@ -12,9 +12,10 @@ namespace Synchronizer_Core.Synch
 {
     public enum Manage_Type:byte 
     {
-        Standart, //Закрепляем файл с самым последней датой изменения, если где-то файла нет устанавливаем имеющейся
-        Ignore, //Закрепляем файл с самым последней датой изменения, если где-то файла игнорируем её
-        Delete //Закрепляем файл с самым последней датой изменения, если файла нет в sync, то удаляем файл (если есть) из dist
+        Join, //Синхронизируем только файлы с одинкаовми именами
+        Source_Join, //Синхронизируем только файлы с одинкаовми именами И переносим из DIST все не существующий файлы
+        Dist_Join, //Синхронизируем только файлы с одинкаовми именами И переносим из SOURCE все не существующий файлы
+        Full //Синхронизируем только файлы с одинкаовми именами И синхронизируем DIST, SOURCE что-бы во всех папках были одинаковые файлы
 
     }
 
@@ -41,7 +42,7 @@ namespace Synchronizer_Core.Synch
         // Получение 2-ух директорий, проверка то что они существуют и настройка директории синхронизации
         public void Add_Path(String sync_path, String dist_path)
         {
-
+            dirs.Clear();
             if (Directory.Exists(sync_path) && Directory.Exists(dist_path))
             {
 
@@ -113,7 +114,72 @@ namespace Synchronizer_Core.Synch
             }
         }
 
-        public void Synchronize(Manage_Type manage_type = Manage_Type.Standart)
+        //Синхронизирует 2 файла, отлавливая исключения и внося их в журнал Errors
+        protected void synch_files(FileInfo from, FileInfo to)
+        {
+            if ((from == null) || (to == null))
+            {    throw new ArgumentNullException("From and To can`t be null!");}
+
+            if (!from.Exists) { Errors.AddLast($"Source ({from}) dosen`t exist!"); return; }
+            if (!to.Exists) {
+                    if (!(to.Directory?.Exists??true)) { to.Directory.Create(); }
+                    to.Create().Close(); 
+            }
+
+            try { 
+
+                if (from.IsReadOnly) { Errors.AddLast($"{from.FullName} - is read only"); return; }
+                if (to.IsReadOnly) { Errors.AddLast($"{to.FullName} - is read only"); return; }
+            }
+            catch (Exception ex)
+            {
+                Errors.AddLast(ex.Message);
+                return;
+            }
+
+
+            try
+            {
+                
+                File.Copy(from.FullName, to.FullName, true);
+            } catch(Exception ex)
+            {
+                Errors.AddLast(ex.Message);
+            }
+        }
+        //Создаёт файл в другой папке если его там нет
+        protected void synch_files(FileInfo from, DirectoryInfo to)
+        {
+            if ((from == null) || (to == null))
+            { throw new ArgumentNullException("From and To can`t be null!"); }
+
+            if (!from.Exists) { Errors.AddLast($"Source ({from}) dosen`t exist!"); return; }
+            if (!to.Exists) { to.Create(); }
+
+            try
+            {
+
+                if (from.IsReadOnly) { Errors.AddLast($"{from.FullName} - is read only"); return; }
+            }
+            catch (Exception ex)
+            {
+                Errors.AddLast(ex.Message);
+                return;
+            }
+
+            try
+            {
+
+                from.CopyTo(Path.Combine(to.FullName,from.Name));
+            }
+            catch (Exception ex)
+            {
+                Errors.AddLast(ex.Message);
+            }
+
+        }
+
+        public void Synchronize(Manage_Type manage_type = Manage_Type.Join)
         {
 
             foreach (Tuple<String, String> dir in dirs)
@@ -122,52 +188,182 @@ namespace Synchronizer_Core.Synch
                 DirectoryInfo dist = new DirectoryInfo(dir.Item2);
 
                 FileInfo[] dist_files = dist.GetFiles();
-                foreach (FileInfo source_file in source.GetFiles())
+                FileInfo[] source_files = source.GetFiles();
+
+                //First - from file, Second - to file
+                LinkedList<Tuple<FileInfo, FileInfo>> files_move_to_source = new();
+                LinkedList<Tuple<FileInfo, FileInfo>> files_move_to_distination = new();
+
+                foreach (FileInfo dist_file in dist_files)
                 {
-                    FileInfo? dist_file = null;
-
-                    try
-                    {
-                        dist_file = dist_files.First(d_inf => (d_inf.Name == source_file.Name));
-                    } catch (Exception) 
-                    { }
-
                     
-                    if (dist_file!=null)
-                    {
-                        
+
+                   if(source_files.Any(s_f=>s_f.Name==dist_file.Name))
+                   {
+                        FileInfo source_file = source_files.First(s_f => s_f.Name == dist_file.Name);
+
                         if (dist_file.LastWriteTime > source_file.LastWriteTime)
                         {
 
-                            try {    dist_file.CopyTo(source_file.FullName, true);
-                            } catch (Exception ex) {
-                                Errors.AddLast($"{dist_file.FullName} >> {source_file.FullName}\nCatched: {ex.Message}");  }
-
+                            files_move_to_source.AddLast( Tuple.Create(dist_file,source_file) );
                         } else
                         {
 
-                            try {    source_file.CopyTo(dist_file.FullName, true);
-                            } catch (Exception ex) {
-                                Errors.AddLast($"{source_file.FullName } >> {dist_file.FullName}\nCatched: {ex.Message}");  }
+                            files_move_to_distination.AddLast( Tuple.Create(source_file,dist_file) );
                         }
+                   }
+                }
 
-                    }
-                    else
-                    {
-                        
-                        try {
 
-                            source_file.CopyTo(
-                                Path.Combine(dist.FullName, source_file.Name), true);
-                        } catch (Exception ex)
-                        {
-                            Errors.AddLast($"{source_file.FullName} >> create\n{ex.Message}");
+                switch (manage_type) {
+                    case (Manage_Type.Join): {
+                            
+                            /*Перекидываем файлы из хранилища(distination) в рабочую папку(source)*/
+                            foreach(var file in files_move_to_source)
+                            {
+                                synch_files(file.Item1, file.Item2);
+                            }
+
+                            /*Обратный процесс перекидываем файлы из рабочей папки в хранилище*/
+                            foreach (var file in files_move_to_distination)
+                            {
+                                synch_files(file.Item1, file.Item2);
+                            }
+
+                            break; 
                         }
-                    }
+                    case (Manage_Type.Source_Join): {
+
+                            /*аналогично join*/
+                            foreach (var file in files_move_to_source)
+                            {
+                                synch_files(file.Item1, file.Item2);
+                            }
+                            foreach (var file in files_move_to_distination)
+                            {
+                                synch_files(file.Item1, file.Item2);
+                            }
+
+                            /*Находим файлы в хранилище и перемещаем их в рабочую папку*/
+                            var new_dist_files = from dist_file in dist_files
+                                                 where !source_files.Any(s_f=>s_f.Name == dist_file.Name)
+                                                 select dist_file;
+
+                            foreach (var file in new_dist_files)
+                            {
+                                synch_files(file, source);
+                            }
+
+                            break; 
+                        }
+                    case (Manage_Type.Dist_Join): {
+
+                            /*аналогично join*/
+                            foreach (var file in files_move_to_source)
+                            {
+                                synch_files(file.Item1, file.Item2);
+                            }
+                            foreach (var file in files_move_to_distination)
+                            {
+                                synch_files(file.Item1, file.Item2);
+                            }
+
+                            /*Находим файлы в рабочей папке и перемещаем их в хранилище*/
+                            var new_source_files = from source_file in source_files
+                                                 where !dist_files.Any(d_f=>d_f.Name==source_file.Name)
+                                                 select source_file;
+
+                            foreach (var file in new_source_files)
+                            {
+                                synch_files(file, dist);
+                            }
+
+                            break;
+                        }
+                    case (Manage_Type.Full): {
+
+                            foreach (var file in files_move_to_source)
+                            {
+                                synch_files(file.Item1, file.Item2);
+                            }
+                            foreach (var file in files_move_to_distination)
+                            {
+                                synch_files(file.Item1, file.Item2);
+                            }
 
 
+                            var new_dist_files = from dist_file in dist_files
+                                                 where !source_files.Any(s_f => s_f.Name == dist_file.Name)
+                                                 select dist_file;
+
+                            foreach (var file in new_dist_files)
+                            {
+                                synch_files(file, source);
+                            }
+
+                            var new_source_files = from source_file in source_files
+                                                   where !dist_files.Any(d_f => d_f.Name == source_file.Name)
+                                                   select source_file;
+
+                            foreach (var file in new_source_files)
+                            {
+                                synch_files(file, dist);
+                            }
+
+
+                            break; 
+                        }
+                    
 
                 }
+
+                //FileInfo[] dist_files = dist.GetFiles();
+                //foreach (FileInfo source_file in source.GetFiles())
+                //{
+                //    FileInfo? dist_file = null;
+
+                //    try
+                //    {
+                //        dist_file = dist_files.First(d_inf => (d_inf.Name == source_file.Name));
+                //    } catch (Exception) 
+                //    { }
+
+
+                //    if (dist_file!=null)
+                //    {
+
+                //        if (dist_file.LastWriteTime > source_file.LastWriteTime)
+                //        {
+
+                //            try {    dist_file.CopyTo(source_file.FullName, true);
+                //            } catch (Exception ex) {
+                //                Errors.AddLast($"{dist_file.FullName} >> {source_file.FullName}\nCatched: {ex.Message}");  }
+
+                //        } else
+                //        {
+
+                //            try {    source_file.CopyTo(dist_file.FullName, true);
+                //            } catch (Exception ex) {
+                //                Errors.AddLast($"{source_file.FullName } >> {dist_file.FullName}\nCatched: {ex.Message}");  }
+                //        }
+
+                //    }
+                //    else
+                //    {
+
+                //        try {
+
+                //            source_file.CopyTo(
+                //                Path.Combine(dist.FullName, source_file.Name), true);
+                //        } catch (Exception ex)
+                //        {
+                //            Errors.AddLast($"{source_file.FullName} >> create\n{ex.Message}");
+                //        }
+                //    }
+
+
+
+                //}
             }
             
         }

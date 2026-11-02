@@ -12,6 +12,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Win_Synch", "Win_Synch\Win_
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleApp1", "ConsoleApp1\ConsoleApp1.csproj", "{B0B140B8-E334-4C6A-98A1-F263D8E75D4C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Synchronizer_Core_Tests", "Synchronizer_Core_Tests\Synchronizer_Core_Tests.csproj", "{243AE8EB-E6C3-48B0-8E7B-D65C4FCC0ABE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -30,6 +32,10 @@ Global
 		{B0B140B8-E334-4C6A-98A1-F263D8E75D4C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B0B140B8-E334-4C6A-98A1-F263D8E75D4C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B0B140B8-E334-4C6A-98A1-F263D8E75D4C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{243AE8EB-E6C3-48B0-8E7B-D65C4FCC0ABE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{243AE8EB-E6C3-48B0-8E7B-D65C4FCC0ABE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{243AE8EB-E6C3-48B0-8E7B-D65C4FCC0ABE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{243AE8EB-E6C3-48B0-8E7B-D65C4FCC0ABE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
