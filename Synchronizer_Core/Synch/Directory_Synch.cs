@@ -42,7 +42,7 @@ namespace Synchronizer_Core.Synch
         // Получение 2-ух директорий, проверка то что они существуют и настройка директории синхронизации
         public void Add_Path(String sync_path, String dist_path)
         {
-
+            dirs.Clear();
             if (Directory.Exists(sync_path) && Directory.Exists(dist_path))
             {
 
@@ -140,7 +140,8 @@ namespace Synchronizer_Core.Synch
 
             try
             {
-                File.Move(from.FullName, to.FullName, true);
+                
+                File.Copy(from.FullName, to.FullName, true);
             } catch(Exception ex)
             {
                 Errors.AddLast(ex.Message);

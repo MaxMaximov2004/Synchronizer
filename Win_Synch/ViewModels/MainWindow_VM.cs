@@ -37,7 +37,7 @@ namespace Win_Synch.ViewModels
             NewSynchUnits_VM new_unit = new NewSynchUnits_VM(path_working_dir);
             NewSynchUnits_V window = new NewSynchUnits_V(new_unit);
             window.Show();
-            Manage_Units.Add(new_unit);нной папке
+            Manage_Units.Add(new_unit);
         }
 
         //path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonDocuments), "Win_Synch", "Data.txt")

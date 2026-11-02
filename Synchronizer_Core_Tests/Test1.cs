@@ -15,14 +15,17 @@ namespace Synchronizer_Core_Tests
             public void Setup()
             {
                 // Создаем уникальные временные папки для изоляции тестов
-                string tempRoot = Path.Combine(Path.GetTempPath(), "SyncTests_" + Guid.NewGuid().ToString("N"));
+                //string tempRoot = Path.Combine(Path.GetTempPath(), "SyncTests_" + Guid.NewGuid().ToString("N"));
+                string tempRoot = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory), "Tests", "SyncTests_" + Guid.NewGuid().ToString("N"));
+                
                 Directory.CreateDirectory(tempRoot);
 
                 _baseSourceDir = Path.Combine(tempRoot, "Source");
                 _baseDestDir = Path.Combine(tempRoot, "Destination");
 
                 Directory.CreateDirectory(_baseSourceDir);
-                // Destination оставляем пустой, как и требовалось в ТЗ
+                Directory.CreateDirectory(_baseDestDir);
+                
 
                 _synch = new Directory_Synch();
 
@@ -60,6 +63,8 @@ namespace Synchronizer_Core_Tests
                 // Arrange: Создаем структуру с вложенными папками и файлами в Source
                 string subDir = Path.Combine(_actualSourceDir, "SubFolder");
                 Directory.CreateDirectory(subDir);
+
+                _synch.Add_Path(_baseSourceDir, _baseDestDir);
 
                 CreateFile(_actualSourceDir, "root_file.txt", "Root content", DateTime.Now.AddDays(-2));
                 CreateFile(subDir, "nested_file.txt", "Nested content", DateTime.Now.AddDays(-1));
@@ -166,36 +171,40 @@ namespace Synchronizer_Core_Tests
                 Assert.IsFalse(File.Exists(Path.Combine(_actualSourceDir, "unique_in_dest.txt")));
             }
 
-            #endregion
+        #endregion
 
-            #region 4. Тест режима Full (Полная двусторонняя синхронизация)
+        #region 4. Тест режима Full (Полная двусторонняя синхронизация)
 
-            [TestMethod]
-            public void Synchronize_Full_SyncsBothUniqueAndConflictingFiles()
-            {
-                // Arrange
-                // Конфликтный файл (Source новее)
-                CreateFile(_actualSourceDir, "conflict.txt", "New Source", DateTime.Now);
-                CreateFile(_actualDestDir, "conflict.txt", "Old Dest", DateTime.Now.AddDays(-1));
+        [TestMethod]
+        public void Synchronize_Full_SyncsBothUniqueAndConflictingFiles()
+        {
+            // Arrange
+            // Конфликтный файл (Source новее)
+            CreateFile(_actualSourceDir, "conflict.txt", "New Source", DateTime.Now);
+            CreateFile(_actualDestDir, "conflict.txt", "Old Dest", DateTime.Now.AddDays(-1));
 
-                // Уникальные файлы
-                CreateFile(_actualSourceDir, "only_source.txt", "Src", DateTime.Now);
-                CreateFile(_actualDestDir, "only_dest.txt", "Dst", DateTime.Now);
+            // Уникальные файлы
+            CreateFile(_actualSourceDir, "only_source.txt", "Src", DateTime.Now);
+            CreateFile(_actualDestDir, "only_dest.txt", "Dst", DateTime.Now);
 
-                // Act
-                _synch.Synchronize(Manage_Type.Full);
+            // Act
+            _synch.Synchronize(Manage_Type.Full);
 
-                // Assert: Обе папки должны стать полностью идентичными
-                // 1. Конфликт разрешен в пользу Source
-                Assert.AreEqual("New Source", File.ReadAllText(Path.Combine(_actualDestDir, "conflict.txt")));
-                Assert.AreEqual("New Source", File.ReadAllText(Path.Combine(_actualSourceDir, "conflict.txt")));
+            // Assert: Обе папки должны стать полностью идентичными
+            // 1. Конфликт разрешен в пользу Source
 
-                // 2. Уникальные файлы скопированы в обе стороны
-                Assert.IsTrue(File.Exists(Path.Combine(_actualDestDir, "only_source.txt")));
-                Assert.IsTrue(File.Exists(Path.Combine(_actualSourceDir, "only_dest.txt")));
-            }
+            
 
-            #endregion
+            
+             Assert.AreEqual("New Source", File.ReadAllText(Path.Combine(_actualDestDir, "conflict.txt")));
+             Assert.AreEqual("New Source", File.ReadAllText(Path.Combine(_actualSourceDir, "conflict.txt")));
+            
+            // 2. Уникальные файлы скопированы в обе стороны
+            Assert.IsTrue(File.Exists(Path.Combine(_actualDestDir, "only_source.txt")));
+            Assert.IsTrue(File.Exists(Path.Combine(_actualSourceDir, "only_dest.txt")));
         }
-    
+
+        #endregion
+    }
+
 }
