@@ -1,4 +1,5 @@
-﻿using Synchronizer_Core;
+﻿// MainWindow_VM.cs (обновленный вариант)
+using Synchronizer_Core;
 using Synchronizer_Core.Synch;
 using Synchronizer_Core.Vault_Manager;
 using System;
@@ -19,9 +20,9 @@ using Win_Synch.Views;
 
 namespace Win_Synch.ViewModels
 {
-    public class MainWindow_VM: INotifyPropertyChanged
+    public class MainWindow_VM : INotifyPropertyChanged
     {
-        
+
         public event PropertyChangedEventHandler? PropertyChanged;
         public void OnPropertyChanged([CallerMemberName] string prop = "")
         {
@@ -32,7 +33,7 @@ namespace Win_Synch.ViewModels
 
 
         protected string path_data = ""; //файл данных, что-бы был
-        
+
         //P.S. убрать модификатор public после искоренения всех обработчиков!!! НЕ ЗАБЫТЬ ПРО ЭТО!!!
         public string path_working_dir = ""; //рабочая директория для создания Json-файлов
 
@@ -42,10 +43,13 @@ namespace Win_Synch.ViewModels
 
         protected SynchUnits_VM? selected_unit = null;
         public SynchUnits_VM? Selected_Unit { get { /*Debug.WriteLine("Getted");*/ return selected_unit; } set { /*Debug.WriteLine("Setted"); */ selected_unit = value; OnPropertyChanged(); } }
-        
+
+
 
         /*Комманды*/
         public SimpleCommand Create_Manage_Units { get; set; }
+        public SimpleCommand DeleteUnitCommand { get; set; }
+
         protected void create_manage_units(object? obj)
         {
             NewSynchUnits_VM new_unit = new NewSynchUnits_VM(path_working_dir);
@@ -54,28 +58,43 @@ namespace Win_Synch.ViewModels
             Manage_Units.Add(new_unit);
         }
 
+        protected void delete_unit(object? unit)
+        {
+            if (unit is SynchUnits_VM synchUnit)
+            {
+                // Удаляем из коллекции
+                Manage_Units.Remove(synchUnit);
+                
+                // Если удаляемая единица была выбрана, сбрасываем выбор
+                if (Selected_Unit == synchUnit)
+                {
+                    Selected_Unit = Manage_Units.Count > 0 ? Manage_Units[0] : null;
+                }
+            }
+        }
+
+
+
         //path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonDocuments), "Win_Synch", "Data.txt")
         public MainWindow_VM(string path)
         {
             path_data = path;
             path_working_dir = Path.GetDirectoryName(path) ?? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonDocuments), "Win_Synch");
             Manage_Units = new ObservableCollection<SynchUnits_VM>();
-            
 
             Create_Manage_Units = new SimpleCommand(create_manage_units, (object? obj) => { return true; });
-            
+            DeleteUnitCommand = new SimpleCommand(delete_unit, (object? obj) => { return true; });
 
             if (!File.Exists(path))
             {
-                
                 Directory.CreateDirectory(path_working_dir);
                 File.Create(path_data).Close();
-
-            } else
+            }
+            else
             {
                 /*сканер рабочей папки на наличие json файлов едениц синхронизации*/
-                foreach (var file in new DirectoryInfo(path_working_dir).EnumerateFiles()) {
-
+                foreach (var file in new DirectoryInfo(path_working_dir).EnumerateFiles())
+                {
                     if (file.Extension == ".json")
                     {
                         JSON_Manager manager = new JSON_Manager();
@@ -84,24 +103,17 @@ namespace Win_Synch.ViewModels
                         try
                         {
                             manager.Get();
-
                             Manage_Units.Add(new SynchUnits_VM(file.FullName));
-
                         }
                         catch (Exception ex)
                         {
                             file.Delete();
                         }
-
                     }
                 }
 
                 if (Manage_Units.Count > 0) { Selected_Unit = Manage_Units.ElementAt(0); }
             }
-
-            
         }
-
-    
     }
 }

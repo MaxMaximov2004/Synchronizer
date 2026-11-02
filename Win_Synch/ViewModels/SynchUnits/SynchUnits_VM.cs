@@ -26,6 +26,8 @@ namespace Win_Synch.ViewModels.SynchUnits
         private SimpleCommand _sync;
         private ISynch? _synchManager;
 
+
+
         public override string Name
         {
             get { return _name; }
@@ -65,7 +67,7 @@ namespace Win_Synch.ViewModels.SynchUnits
             }
         }
 
-
+        public LinkedList<Managed_Data> Data { get { return Synch_Manager?.Export_Data() ?? new LinkedList<Managed_Data>(); } }
 
         /*
          * Пока что так, обязательно сделать конструктор более гибким:
@@ -113,7 +115,12 @@ namespace Win_Synch.ViewModels.SynchUnits
         virtual protected void exe_Sync(object? manager)
         {
             //Debug.WriteLine($"Vault val: {Vault_Manager}, Synch val: {Synch_Manager}");
-            Synch_Manager?.Synchronize();
+            if (Synch_Manager != null) 
+            {
+                Thread thread = new Thread(() => { Synch_Manager.Synchronize(); });
+                thread.Start();
+            }
+            //Synch_Manager?.Synchronize();
         }
         virtual protected bool can_exe_Sync(object? manager)
         {
