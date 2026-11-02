@@ -11,22 +11,21 @@
             <RowDefinition Height="10*"/>
             <RowDefinition Height="200*"/>
         </Grid.RowDefinitions>
-        
-        
-        
+
         <Menu Grid.Row="0">
-            <MenuItem Header="Синхронизировать еденицу">
+            <MenuItem Header="Отслеживаемые еденицы синхронизации">
                 <ListBox ItemsSource="{Binding Manage_Units}" SelectedItem="{Binding Selected_Unit, UpdateSourceTrigger=PropertyChanged}">
                     <ListBox.ItemTemplate>
-
                         <DataTemplate>
                             <StackPanel Orientation="Horizontal">
-                                <TextBlock Text="{Binding Name}"/>
-                                <Button Command="{Binding Sync}" CommandParameter="{Binding}">Синхронизировать</Button>
-                                <!--<Button Command="{Binding Select}"> Посмотреть информацию </Button>-->
+                                <TextBlock Text="{Binding Name}" Width="200"/>
+                                <Button Command="{Binding Sync}" CommandParameter="{Binding}" Margin="5,0,5,0">Синхронизировать</Button>
+                                <Button Command="{Binding DataContext.DeleteUnitCommand, RelativeSource={RelativeSource AncestorType=ListBox}}" 
+                                        CommandParameter="{Binding}" 
+                                        Margin="5,0,5,0" 
+                                        Content="Удалить"/>
                             </StackPanel>
                         </DataTemplate>
-
                     </ListBox.ItemTemplate>
                 </ListBox>
             </MenuItem>
@@ -35,20 +34,70 @@
                 <MenuItem Header="Добавить синхронизируемый папку" Command="{Binding Create_Manage_Units}"/>
             </MenuItem>
             <MenuItem Header="DEBUG">
-                <MenuItem Header="debug context" Click="MenuItem_Click_1" > </MenuItem>
-                <MenuItem Header="get errors" Click="MenuItem_Click_2"> </MenuItem>
+                <MenuItem Header="debug context" Click="MenuItem_Click_1" />
+                <MenuItem Header="get errors" Click="MenuItem_Click_2"/>
             </MenuItem>
-
         </Menu>
 
-        <StackPanel Grid.Row="1" Orientation="Vertical" Margin="5,5,5,5">
+        <StackPanel x:Name="WorkField" Grid.Row="1" Orientation="Vertical" Margin="5,5,5,5">
+            <Label Content="{Binding Selected_Unit.Name, UpdateSourceTrigger=PropertyChanged}" FontWeight="Bold" FontSize="16"/>
 
-            <Label Content="{Binding Selected_Unit.Name, UpdateSourceTrigger=PropertyChanged}"></Label>
-            <Label> Ошибки: </Label>
-            <ListBox ItemsSource="{Binding Selected_Unit.Synch_Manager.Errors, UpdateSourceTrigger=PropertyChanged}">
+            <Grid Margin="0,10,0,0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <!--
+                <Label Grid.Row="0" Grid.Column="0" Content="Тип синхронизации:" FontWeight="Bold"/>
+                <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding Selected_Unit.Synch_Manager.GetType().Name, UpdateSourceTrigger=PropertyChanged}" Margin="5,0,0,0"/>
+
+                <Label Grid.Row="1" Grid.Column="0" Content="Тип хранения:" FontWeight="Bold"/>
+                <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding Selected_Unit.Vault_Manager.GetType().Name, UpdateSourceTrigger=PropertyChanged}" Margin="5,0,0,0"/>
+                -->
+
+                <Label 
+                    Grid.Row="2" 
+                    Grid.Column="0" 
+                    Content="Количество директорий:" FontSize="16" />
+                <TextBlock 
+                    Grid.Row="3" 
+                    Grid.Column="0" 
+                    Text="{Binding Selected_Unit.Data.Count, UpdateSourceTrigger=PropertyChanged}" 
+                    FontSize="16"
+                    Margin="5,0,0,0"/>
+            </Grid>
+
+            <Label Content="Ошибки:" Margin="0,10,0,0"/>
+            <ListBox ItemsSource="{Binding Selected_Unit.Synch_Manager.Errors, UpdateSourceTrigger=PropertyChanged}" 
+                     Height="100" 
+                     ScrollViewer.CanContentScroll="True"
+                     ScrollViewer.VerticalScrollBarVisibility="Auto"
+                     Margin="5,0,0,0">
             </ListBox>
-            
-        </StackPanel>
+
+            <Label Content="Детали синхронизации:" Margin="0,10,0,0"/>
+            <ScrollViewer Height="100" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
+                <ItemsControl ItemsSource="{Binding Selected_Unit.Data, UpdateSourceTrigger=PropertyChanged}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Horizontal" Margin="5">
+                                <TextBlock Text="{Binding Source}" Width="auto" TextTrimming="CharacterEllipsis"/>
+                                <TextBlock Text=" > " Margin="5,0,2,0"/>
+                                <TextBlock Text="{Binding Distination}" Width="auto" TextTrimming="CharacterEllipsis"/>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
         
+        </StackPanel>
     </Grid>
 </Window>
