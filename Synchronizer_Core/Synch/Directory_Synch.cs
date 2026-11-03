@@ -179,11 +179,19 @@ namespace Synchronizer_Core.Synch
 
         }
 
-        public void Synchronize(Manage_Type manage_type = Manage_Type.Join)
+        public void Synchronize(Manage_Type manage_type = Manage_Type.Full)
         {
-
+            
+            current_dir = 0; //Специальный счётчик (за который мне стылно что он здесь)
             foreach (Tuple<String, String> dir in dirs)
             {
+
+                current_dir++;
+
+                Debug.WriteLine(dir.Item1);
+                Debug.WriteLine(dir.Item2);
+                Debug.WriteLine("\n");
+
                 DirectoryInfo source = new DirectoryInfo(dir.Item1);
                 DirectoryInfo dist = new DirectoryInfo(dir.Item2);
 
@@ -381,5 +389,11 @@ namespace Synchronizer_Core.Synch
 
             return export;
         }
+        
+        public int Total {  get { return dirs.Count; } }
+
+        protected int current_dir=0;
+        public int Current { get { return current_dir; } }
+    
     }
 }

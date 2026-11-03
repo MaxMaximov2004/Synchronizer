@@ -115,9 +115,11 @@ namespace Win_Synch.ViewModels.SynchUnits
         virtual protected void exe_Sync(object? manager)
         {
             //Debug.WriteLine($"Vault val: {Vault_Manager}, Synch val: {Synch_Manager}");
+            Debug.WriteLine("Begin synch");
             if (Synch_Manager != null) 
             {
-                Thread thread = new Thread(() => { Synch_Manager.Synchronize(); });
+                Thread thread = new Thread(() => { Synch_Manager.Synchronize(Manage_Type.Join); });
+                
                 thread.Start();
             }
             //Synch_Manager?.Synchronize();
@@ -127,9 +129,10 @@ namespace Win_Synch.ViewModels.SynchUnits
             //return (Synch_Manager == null); //Что-то не понятное, почему-то считает что Synch_Manager не существует
             return true;
         }
-        
 
-        
+        public double Total { get { return _synchManager?.Total ?? 1; } }
+        public double Current { get { return _synchManager?.Current ?? 0; } set { } }
+
     }
 
       

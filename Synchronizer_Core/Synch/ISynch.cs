@@ -11,7 +11,9 @@ namespace Synchronizer_Core.Synch
     {
         public void Add_Path(String sync_path, String dist_path);
         public void Synchronize(Manage_Type manage_type = Manage_Type.Join);
-
         public LinkedList<Managed_Data> Export_Data();
+
+        public int Total { get; }
+        public int Current { get; }
     }
 }
