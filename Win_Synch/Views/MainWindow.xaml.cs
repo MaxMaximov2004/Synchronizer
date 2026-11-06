@@ -52,6 +52,8 @@ namespace Win_Synch
 
                 Debug.WriteLine("Selected:");
                 Debug.WriteLine(context.Selected_Unit.Name);
+                Debug.WriteLine(context.Selected_Unit.Manage_Type);
+
             }
         }
 
