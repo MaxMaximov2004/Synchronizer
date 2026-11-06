@@ -25,7 +25,7 @@ namespace Win_Synch.ViewModels.SynchUnits
         private string _name = "NULL :(";
         private SimpleCommand _sync;
         private ISynch? _synchManager;
-
+        public Manage_Type Manage_Type { get; set; } = Manage_Type.Full;
 
 
         public override string Name
@@ -115,9 +115,10 @@ namespace Win_Synch.ViewModels.SynchUnits
         virtual protected void exe_Sync(object? manager)
         {
             //Debug.WriteLine($"Vault val: {Vault_Manager}, Synch val: {Synch_Manager}");
+            Debug.WriteLine("Begin synch");
             if (Synch_Manager != null) 
             {
-                Thread thread = new Thread(() => { Synch_Manager.Synchronize(); });
+                Thread thread = new Thread(() => { Synch_Manager.Synchronize(Manage_Type); });
                 thread.Start();
             }
             //Synch_Manager?.Synchronize();
