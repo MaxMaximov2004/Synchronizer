@@ -9,9 +9,9 @@ namespace Synchronizer_Core.Synch
 {
     public interface ISynch
     {
-        public void Add_Path(String sync_path, String dist_path);
-        public void Synchronize(Manage_Type manage_type = Manage_Type.Full);
+        public abstract void Add_Path(String sync_path, String dist_path);
+        public abstract void Synchronize(Manage_Type manage_type = Manage_Type.Full);
 
-        public LinkedList<Managed_Data> Export_Data();
+        public abstract LinkedList<Managed_Data> Export_Data();
     }
 }
