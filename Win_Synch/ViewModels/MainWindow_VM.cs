@@ -43,7 +43,7 @@ namespace Win_Synch.ViewModels
 
         protected SynchUnits_VM? selected_unit = null;
         public SynchUnits_VM? Selected_Unit { get { /*Debug.WriteLine("Getted");*/ return selected_unit; } set { /*Debug.WriteLine("Setted"); */ selected_unit = value; OnPropertyChanged(); } }
-
+        public static IEnumerable<Manage_Type> ManageTypes { get; } = Enum.GetValues(typeof(Manage_Type)).Cast<Manage_Type>();
 
 
         /*Комманды*/

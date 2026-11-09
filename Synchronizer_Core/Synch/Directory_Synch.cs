@@ -117,6 +117,7 @@ namespace Synchronizer_Core.Synch
         //Синхронизирует 2 файла, отлавливая исключения и внося их в журнал Errors
         protected void synch_files(FileInfo from, FileInfo to)
         {
+            Debug.WriteLine($"\t{from.FullName} >>> {to.FullName}");
             if ((from == null) || (to == null))
             {    throw new ArgumentNullException("From and To can`t be null!");}
 
@@ -150,6 +151,8 @@ namespace Synchronizer_Core.Synch
         //Создаёт файл в другой папке если его там нет
         protected void synch_files(FileInfo from, DirectoryInfo to)
         {
+            Debug.WriteLine($"\t{from.FullName} >>> dir {to.FullName}");
+
             if ((from == null) || (to == null))
             { throw new ArgumentNullException("From and To can`t be null!"); }
 
@@ -179,13 +182,14 @@ namespace Synchronizer_Core.Synch
 
         }
 
-        public void Synchronize(Manage_Type manage_type = Manage_Type.Join)
+        public void Synchronize(Manage_Type manage_type = Manage_Type.Full)
         {
-
+            Debug.WriteLine($"Call method {manage_type}");
             foreach (Tuple<String, String> dir in dirs)
             {
                 DirectoryInfo source = new DirectoryInfo(dir.Item1);
                 DirectoryInfo dist = new DirectoryInfo(dir.Item2);
+                //Debug.WriteLine($"dir({source})>dir({dist})");
 
                 FileInfo[] dist_files = dist.GetFiles();
                 FileInfo[] source_files = source.GetFiles();
@@ -205,17 +209,22 @@ namespace Synchronizer_Core.Synch
                         if (dist_file.LastWriteTime > source_file.LastWriteTime)
                         {
 
+                            //Debug.WriteLine($"FILE {dist_file.FullName} >> {source_file.FullName}");
                             files_move_to_source.AddLast( Tuple.Create(dist_file,source_file) );
                         } else
                         {
 
+                            //Debug.WriteLine($"FILE {source_file.FullName} >> {dist_file.FullName}");
                             files_move_to_distination.AddLast( Tuple.Create(source_file,dist_file) );
                         }
                    }
+
+
                 }
 
 
                 switch (manage_type) {
+
                     case (Manage_Type.Join): {
                             
                             /*Перекидываем файлы из хранилища(distination) в рабочую папку(source)*/
@@ -249,6 +258,8 @@ namespace Synchronizer_Core.Synch
                                                  where !source_files.Any(s_f=>s_f.Name == dist_file.Name)
                                                  select dist_file;
 
+                            Debug.WriteLine($"Source Join new files> {new_dist_files.Count()}");
+
                             foreach (var file in new_dist_files)
                             {
                                 synch_files(file, source);
@@ -272,6 +283,9 @@ namespace Synchronizer_Core.Synch
                             var new_source_files = from source_file in source_files
                                                  where !dist_files.Any(d_f=>d_f.Name==source_file.Name)
                                                  select source_file;
+
+                            Debug.WriteLine($"Dist Join new files> {new_source_files.Count()}");
+
 
                             foreach (var file in new_source_files)
                             {
@@ -310,11 +324,12 @@ namespace Synchronizer_Core.Synch
                                 synch_files(file, dist);
                             }
 
+                            Debug.WriteLine($"Dist Join new files> {new_source_files.Count()}");
+                            Debug.WriteLine($"Source Join new files> {new_dist_files.Count()}");
 
                             break; 
                         }
                     
-
                 }
 
                 //FileInfo[] dist_files = dist.GetFiles();
