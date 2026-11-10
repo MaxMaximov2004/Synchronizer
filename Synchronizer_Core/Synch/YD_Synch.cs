@@ -10,13 +10,437 @@ using System.Threading.Tasks;
 namespace Synchronizer_Core.Synch
 {
 
-    class YD_Data
+    /// <summary>
+    /// Перечисление доступных полей для запросов к Yandex Disk API
+    /// </summary>
+    public enum YD_Field
     {
-        public string path = "disk:";
-        public int limit = 20;
-        public int offset = 0;
-        public string fields = "";
+        /// <summary>
+        /// Путь к ресурсу
+        /// </summary>
+        path,
 
+        /// <summary>
+        /// Тип ресурса (file или folder)
+        /// </summary>
+        type,
+
+        /// <summary>
+        /// Имя ресурса
+        /// </summary>
+        name,
+
+        /// <summary>
+        /// Размер ресурса в байтах
+        /// </summary>
+        size,
+
+        /// <summary>
+        /// Дата последнего изменения
+        /// </summary>
+        modified,
+
+        /// <summary>
+        /// Дата создания ресурса
+        /// </summary>
+        created,
+
+        /// <summary>
+        /// Ссылка на ресурс
+        /// </summary>
+        resource_id,
+
+        /// <summary>
+        /// MIME-тип файла
+        /// </summary>
+        mime_type,
+
+        /// <summary>
+        /// Ссылка на файл
+        /// </summary>
+        file,
+
+        /// <summary>
+        /// Список вложенных ресурсов
+        /// </summary>
+        items,
+
+        /// <summary>
+        /// Количество вложенных ресурсов
+        /// </summary>
+        _embedded,
+
+        /// <summary>
+        /// Ссылка на родительскую папку
+        /// </summary>
+        parent,
+
+        /// <summary>
+        /// Статус ресурса
+        /// </summary>
+        status,
+
+        /// <summary>
+        /// Ссылка на публичный ресурс
+        /// </summary>
+        public_url,
+
+        /// <summary>
+        /// Статус публикации
+        /// </summary>
+        publish_status,
+
+        /// <summary>
+        /// Статус доступа
+        /// </summary>
+        access,
+
+        /// <summary>
+        /// Статус владельца
+        /// </summary>
+        owner,
+
+        /// <summary>
+        /// Статус обновления
+        /// </summary>
+        updated,
+
+        /// <summary>
+        /// Статус удаления
+        /// </summary>
+        deleted,
+
+        /// <summary>
+        /// Статус восстановления
+        /// </summary>
+        restored,
+
+        /// <summary>
+        /// Статус перемещения
+        /// </summary>
+        moved,
+
+        /// <summary>
+        /// Статус копирования
+        /// </summary>
+        copied,
+
+        /// <summary>
+        /// Статус синхронизации
+        /// </summary>
+        synced,
+
+        /// <summary>
+        /// Статус загрузки
+        /// </summary>
+        uploaded,
+
+        /// <summary>
+        /// Статус скачивания
+        /// </summary>
+        downloaded,
+
+        /// <summary>
+        /// Статус обработки
+        /// </summary>
+        processed,
+
+        /// <summary>
+        /// Статус ошибки
+        /// </summary>
+        error,
+
+        /// <summary>
+        /// Статус успеха
+        /// </summary>
+        success,
+
+        /// <summary>
+        /// Статус завершения
+        /// </summary>
+        completed,
+
+        /// <summary>
+        /// Статус начала
+        /// </summary>
+        started,
+
+        /// <summary>
+        /// Статус ожидания
+        /// </summary>
+        waiting,
+
+        /// <summary>
+        /// Статус активности
+        /// </summary>
+        active,
+
+        /// <summary>
+        /// Статус неактивности
+        /// </summary>
+        inactive,
+
+        /// <summary>
+        /// Статус блокировки
+        /// </summary>
+        locked,
+
+        /// <summary>
+        /// Статус разблокировки
+        /// </summary>
+        unlocked,
+
+        /// <summary>
+        /// Статус архивации
+        /// </summary>
+        archived,
+
+        /// <summary>
+        /// Статус разархивации
+        /// </summary>
+        unarchived,
+
+        /// <summary>
+        /// Статус резервного копирования
+        /// </summary>
+        backup,
+
+        /// <summary>
+        /// Статус восстановления
+        /// </summary>
+        restore,
+
+        /// <summary>
+        /// Статус очистки
+        /// </summary>
+        clean,
+
+        /// <summary>
+        /// Статус проверки
+        /// </summary>
+        check,
+
+        /// <summary>
+        /// Статус анализа
+        /// </summary>
+        analyze,
+
+        /// <summary>
+        /// Статус оптимизации
+        /// </summary>
+        optimize,
+
+        /// <summary>
+        /// Статус компрессии
+        /// </summary>
+        compress,
+
+        /// <summary>
+        /// Статус декомпрессии
+        /// </summary>
+        decompress,
+
+        /// <summary>
+        /// Статус шифрования
+        /// </summary>
+        encrypt,
+
+        /// <summary>
+        /// Статус дешифрования
+        /// </summary>
+        decrypt,
+
+        /// <summary>
+        /// Статус подписи
+        /// </summary>
+        sign,
+
+        /// <summary>
+        /// Статус проверки подписи
+        /// </summary>
+        verify,
+
+        /// <summary>
+        /// Статус аутентификации
+        /// </summary>
+        authenticate,
+
+        /// <summary>
+        /// Статус авторизации
+        /// </summary>
+        authorize
+    }
+
+
+    public record YD_ApiData
+    {
+        public string path { get; set; } = "disk:";
+        public int limit { get; set; } = 20;
+        public int offset { get; set; } = 0;
+        public string fields { get; set; } = "path,name,size"; // Сериализованные поля через запятую
+
+        // Конструктор для удобства
+        public YD_ApiData() { }
+
+        public YD_ApiData(string path, int limit, int offset, string fields)
+        {
+            this.path = path;
+            this.limit = limit;
+            this.offset = offset;
+            this.fields = fields;
+        }
+    }
+
+  
+    public class YD_DataBuilder
+    {
+        private string _path = "disk:";
+        private int _limit = 20;
+        private int _offset = 0;
+        private YD_Field[] _fields = { YD_Field.path, YD_Field.name, YD_Field.size };
+
+        // Конструктор с валидацией
+        public YD_DataBuilder(int limit = 20, int offset = 0)
+        {
+            Limit = limit;
+            Offset = offset;
+        }
+
+        // Свойства с валидацией
+        public int Limit
+        {
+            get => _limit;
+            set
+            {
+                if (value < 0)
+                    throw new ArgumentOutOfRangeException(nameof(Limit), "Limit cannot be less than zero");
+                _limit = value;
+            }
+        }
+
+        public int Offset
+        {
+            get => _offset;
+            set
+            {
+                if (value < 0)
+                    throw new ArgumentOutOfRangeException(nameof(Offset), "Offset cannot be less than zero");
+                _offset = value;
+            }
+        }
+
+        public string Path
+        {
+            get => _path;
+            set
+            {
+                if (!IsValidPath(value))
+                    throw new ArgumentException("Path must be in format 'disk:' or 'disk:/folder1/folder2'", nameof(Path));
+                _path = value;
+            }
+        }
+
+        public YD_Field[] Fields
+        {
+            get => _fields;
+            set => _fields = value ?? throw new ArgumentNullException(nameof(Fields));
+        }
+        private bool IsValidPath(string path)
+        {
+            if (string.IsNullOrEmpty(path))
+                return false;
+
+            if (path == "disk:")
+                return true;
+
+            if (path.StartsWith("disk:/"))
+            {
+                // Проверяем, что путь содержит только допустимые символы после disk:/
+                var pathPart = path.Substring(5); // Убираем "disk:"
+                return !pathPart.Contains("..") && !pathPart.Contains("//");
+            }
+
+            return false;
+        }
+
+        // Метод добавления папки в путь
+        public void AddFolderToPath(string folderName)
+        {
+            if (string.IsNullOrWhiteSpace(folderName))
+                throw new ArgumentException("Folder name cannot be null or empty", nameof(folderName));
+
+            // Проверяем, что имя папки не содержит запрещенных символов
+            if (folderName.Contains("/") || folderName.Contains("\\") || folderName.Contains(":"))
+                throw new ArgumentException("Folder name contains invalid characters", nameof(folderName));
+
+            if (_path == "disk:")
+            {
+                _path = $"disk:/{folderName}";
+            }
+            else
+            {
+                // Убедимся, что путь заканчивается на /
+                if (!_path.EndsWith("/"))
+                    _path += "/";
+                _path += folderName;
+            }
+        }
+
+        // Метод очистки пути (оставляет только "disk:")
+        public void ClearPath()
+        {
+            _path = "disk:";
+        }
+
+        // Метод для получения сериализуемого объекта
+        public YD_ApiData ToApiData()
+        {
+            return new YD_ApiData
+            {
+                path = _path,
+                limit = _limit,
+                offset = _offset,
+                fields = string.Join(",", _fields.Select(f => f.ToString()))
+            };
+        }
+
+        // Метод для создания нового объекта с заданными полями
+        public YD_DataBuilder WithFields(params YD_Field[] fields)
+        {
+            Fields = fields;
+            return this;
+        }
+
+        // Метод для создания нового объекта с заданным путем
+        public YD_DataBuilder WithPath(string path)
+        {
+            Path = path;
+            return this;
+        }
+
+        // Метод для создания нового объекта с заданным лимитом
+        public YD_DataBuilder WithLimit(int limit)
+        {
+            Limit = limit;
+            return this;
+        }
+
+        // Метод для создания нового объекта с заданным офсетом
+        public YD_DataBuilder WithOffset(int offset)
+        {
+            Offset = offset;
+            return this;
+        }
+
+        // Метод для создания объекта с заданными параметрами
+        public YD_DataBuilder WithAll(int limit = 20, int offset = 0, string path = "disk:", params YD_Field[] fields)
+        {
+            Limit = limit;
+            Offset = offset;
+            Path = path;
+            Fields = fields;
+            return this;
+        }
     }
 
     public class YD_Synch : ISynch
@@ -24,6 +448,14 @@ namespace Synchronizer_Core.Synch
         /*Поля класса*/
         protected LinkedList<Managed_Data> dirs = new LinkedList<Managed_Data>();
         public LinkedList<Exception> Errors { get; set;} = new LinkedList<Exception>();
+        private string token = string.Empty;
+        private string adress = "https://cloud-api.yandex.net/v1/disk/resources";
+        /**/
+        public YD_Synch(string token)
+        {
+            this.token = token;
+        }
+        private YD_Synch() { }
 
 
         /*необходимые методы*/
@@ -43,20 +475,11 @@ namespace Synchronizer_Core.Synch
             if (string.IsNullOrWhiteSpace(sync_path))
             { throw new ArgumentException("Путь синхронизации не может быть пустым", nameof(sync_path)); }
 
-            if (string.IsNullOrWhiteSpace(dist_path))
-            { throw new ArgumentException("URL дистанционного хранилища не может быть пустым", nameof(dist_path)); }
-
             if (!Directory.Exists(sync_path))
             {
                 throw new DirectoryNotFoundException($"Синхронизируемая директория не найдена: {sync_path}");
             }
-            if (!IsYandexDiskUrl(dist_path))
-            {
-                throw new ArgumentException(
-                    $"Неверный URL Yandex Disk. Ожидается формат: https://cloud-api.yandex.net/v1/disk/..., получено: {dist_path}",
-                    nameof(dist_path));
-            }
-
+            
 
             LinkedList<DirectoryInfo> _source_dirs = new LinkedList<DirectoryInfo>(); //Список всех доступных локальных папок
             _source_dirs.AddFirst(new DirectoryInfo(sync_path));
@@ -83,9 +506,13 @@ namespace Synchronizer_Core.Synch
             }
 
             
-            Uri _dist_dirs = new Uri(dist_path);
+            UriBuilder _dist_dirs = new UriBuilder(adress);
             {
-                DirectoryInfo root = (new DirectoryInfo(sync_path)).Parent ?? (new DirectoryInfo(sync_path)).Root;
+                
+                
+
+                
+                //DirectoryInfo root = (new DirectoryInfo(sync_path)).Parent ?? (new DirectoryInfo(sync_path)).Root;
 
             }
         }

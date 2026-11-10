@@ -6,8 +6,9 @@ using Synchronizer_Core.Synch;
 using System.Collections.Generic;
 using System.Text.Json;
 
-YD_Synch test = new YD_Synch();
-test.Add_Path("C:\\Users\\Макс\\Desktop\\Json Processor 1", "https://cloud-api.yandex.net/v1/disk/resources/files");
+//YD_Synch test = new YD_Synch("STAB");
+//test.Add_Path("C:\\Users\\Макс\\Desktop\\Json Processor 1", "obsidian");
+
 
 //Directory_Manager manage = new Directory_Manager();
 //manage.Add_Path();
