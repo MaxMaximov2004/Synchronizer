@@ -2,7 +2,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http.Json;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 
@@ -289,8 +291,13 @@ namespace Synchronizer_Core.Synch
             this.offset = offset;
             this.fields = fields;
         }
-    }
 
+        //TODO
+        public string querry_string()
+        {
+            return new string($"path={path}&limit={limit}&offset={offset}&fields={fields}");
+        }
+    }
   
     public class YD_DataBuilder
     {
@@ -469,7 +476,7 @@ namespace Synchronizer_Core.Synch
             throw new NotImplementedException();
         }
 
-        public void Add_Path(string sync_path, string dist_path)
+        public void Add_Path(string sync_path, string dist_folder_name)
         {
 
             if (string.IsNullOrWhiteSpace(sync_path))
@@ -481,6 +488,7 @@ namespace Synchronizer_Core.Synch
             }
             
 
+            /*Обрабатываем все локальные папки (на ПК)*/
             LinkedList<DirectoryInfo> _source_dirs = new LinkedList<DirectoryInfo>(); //Список всех доступных локальных папок
             _source_dirs.AddFirst(new DirectoryInfo(sync_path));
             {
@@ -505,16 +513,53 @@ namespace Synchronizer_Core.Synch
                 }
             }
 
-            
+            /*Папки в удалённой директории*/
             UriBuilder _dist_dirs = new UriBuilder(adress);
             {
-                
-                
-
-                
                 //DirectoryInfo root = (new DirectoryInfo(sync_path)).Parent ?? (new DirectoryInfo(sync_path)).Root;
+                string _source_dir_name = (new DirectoryInfo(sync_path)).Name;
+
+
 
             }
+
+
+        }
+
+        public void ynadex_disc_create_folder(YD_ApiData folder_data, HttpClient client, bool check)
+        {
+            //флаг check - подразумевает обязывать метод проверять создана ли папка - если да создовать её не нужно, нет - создать
+
+            UriBuilder addr_with_data = new UriBuilder(adress);
+            addr_with_data.Query = folder_data.querry_string();
+            
+            var _req = new HttpRequestMessage( HttpMethod.Put, addr_with_data.Uri);
+            HttpResponseMessage? _resp = null;
+
+            try
+            {
+                _req.Headers.Add("Authorization", token);
+                
+                //_req.Content = JsonContent.Create(folder_data);
+                _resp = client.SendAsync(_req).Result;
+            }
+            catch (Exception e) { Errors.AddLast(e); }
+
+            if (_resp != null) {
+
+                if (_resp.StatusCode == System.Net.HttpStatusCode.OK) {
+
+                    Console.WriteLine(_resp.Content.ReadAsStringAsync().Result);
+                }
+                else
+                {
+                    Errors.AddLast(
+                        new ArgumentException
+                            ($"Получили статус: {_resp.StatusCode}\nЗапрос: {_req.ToString()}\t\t{_req.Content?.ReadAsStringAsync().Result}\nОтвет: {_resp.ToString()}\t\t{_resp.Content?.ReadAsStringAsync().Result}")
+                        );
+                }
+
+            } 
         }
 
         /*Дополниительные мтеоды*/

@@ -6,7 +6,25 @@ using Synchronizer_Core.Synch;
 using System.Collections.Generic;
 using System.Text.Json;
 
-//YD_Synch test = new YD_Synch("STAB");
+YD_Synch test = new YD_Synch("y0__wgBEIG62KMHGN-nSSCZxJD_GDD4pdXyB4s2QwVLO0aDW9YTkDTsctevs_SE");
+
+using (var http_client = new HttpClient())
+{
+    YD_DataBuilder builder = new YD_DataBuilder();
+    builder.AddFolderToPath("test_0");
+    builder.AddFolderToPath("test_1");
+
+    Console.WriteLine(builder.ToApiData().ToString());
+
+    test.ynadex_disc_create_folder(builder.ToApiData(), http_client, true);
+
+    foreach(var excp in test.Errors)
+    {
+        Console.WriteLine(excp.Message);
+    }
+
+}
+
 //test.Add_Path("C:\\Users\\Макс\\Desktop\\Json Processor 1", "obsidian");
 
 
