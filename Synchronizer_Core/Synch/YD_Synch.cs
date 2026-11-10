@@ -292,7 +292,7 @@ namespace Synchronizer_Core.Synch
             this.fields = fields;
         }
 
-        //TODO
+        //TODO Вырезать этот метод и найти что-нибудь что генерирует список строку запроса из переданной записи (тип как сериализатор Json)
         public string querry_string()
         {
             return new string($"path={path}&limit={limit}&offset={offset}&fields={fields}");
@@ -514,19 +514,47 @@ namespace Synchronizer_Core.Synch
             }
 
             /*Папки в удалённой директории*/
-            UriBuilder _dist_dirs = new UriBuilder(adress);
+            
+            LinkedList<string> _remotes = new LinkedList<string>();
+            using (var http_client = new HttpClient())
             {
-                //DirectoryInfo root = (new DirectoryInfo(sync_path)).Parent ?? (new DirectoryInfo(sync_path)).Root;
-                string _source_dir_name = (new DirectoryInfo(sync_path)).Name;
+               {
+                 string _source_dir_name = (new DirectoryInfo(sync_path)).Name;
+                 YD_DataBuilder builder = new YD_DataBuilder();
+                 builder.AddFolderToPath(dist_folder_name);
+                 builder.AddFolderToPath(_source_dir_name);
 
+                 YD_ApiData data = builder.ToApiData();
+                 //yandex_disc_create_folder(data, http_client, true);
+                 _remotes.AddLast(data.path);
+               }
 
+                var _local = new DirectoryInfo(sync_path);
+               foreach (DirectoryInfo dir in _source_dirs)
+               {
+                    string reletive_path = Path.GetRelativePath(_local.FullName, dir.FullName);
 
+                    if (reletive_path != ".")
+                    {
+
+                        YD_DataBuilder builder = new YD_DataBuilder();
+                        builder.AddFolderToPath(dist_folder_name);
+                        
+                        builder.AddFolderToPath(reletive_path); //Получаем ошибку сорее всего нужно исправть билдер
+
+                        YD_ApiData data = builder.ToApiData();
+                        //yandex_disc_create_folder(data, http_client, true);
+                        _remotes.AddLast(data.path);
+                    }
+
+                }
             }
 
+            dirs = new(_source_dirs.Zip(_remotes, (src, rmt) => new Managed_Data(rmt, src.FullName)));
 
         }
 
-        public void ynadex_disc_create_folder(YD_ApiData folder_data, HttpClient client, bool check)
+        public void yandex_disc_create_folder(YD_ApiData folder_data, HttpClient client, bool check)
         {
             //флаг check - подразумевает обязывать метод проверять создана ли папка - если да создовать её не нужно, нет - создать
 
