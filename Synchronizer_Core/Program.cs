@@ -1,9 +1,13 @@
 ﻿
 using Synchronizer_Core;
 using Synchronizer_Core.Vault_Manager;
+using Synchronizer_Core.Synch;
+
 using System.Collections.Generic;
 using System.Text.Json;
 
+YD_Synch test = new YD_Synch();
+test.Add_Path("C:\\Users\\Макс\\Desktop\\Json Processor 1", "https://cloud-api.yandex.net/v1/disk/resources/files");
 
 //Directory_Manager manage = new Directory_Manager();
 //manage.Add_Path();
