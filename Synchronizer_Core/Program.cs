@@ -8,10 +8,17 @@ using System.Text.Json;
 
 YD_Synch test = new YD_Synch("STAB");
 test.Add_Path("C:\\Users\\Макс\\Desktop\\курсачи", "Test");
-foreach(var unit in test.Export_Data())
+
+foreach(var item in test.Export_Data())
 {
-    Console.WriteLine($"{unit.Source} >> {unit.Distination}");
+    Console.WriteLine($"{item.Source}>>>{item.Distination}");
 }
+
+foreach(var error in test.Errors)
+{
+    Console.WriteLine(error.Message);
+}
+
 /*using (var http_client = new HttpClient())
 {
     YD_DataBuilder builder = new YD_DataBuilder();

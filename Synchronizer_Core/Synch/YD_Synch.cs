@@ -376,8 +376,11 @@ namespace Synchronizer_Core.Synch
             if (string.IsNullOrWhiteSpace(folderName))
                 throw new ArgumentException("Folder name cannot be null or empty", nameof(folderName));
 
-            // Проверяем, что имя папки не содержит запрещенных символов
-            if (folderName.Contains("/") || folderName.Contains("\\") || folderName.Contains(":"))
+            //Если получаем не наш разделитель, то меням его на наш
+            if(folderName.Contains("\\")) { folderName.Replace("\\", "/"); }
+            
+            // Проверяем, что имя папки не содержит запрещенных символов - добавить если есть
+            if ( folderName.Contains(":"))
                 throw new ArgumentException("Folder name contains invalid characters", nameof(folderName));
 
             if (_path == "disk:")
@@ -522,10 +525,11 @@ namespace Synchronizer_Core.Synch
                  string _source_dir_name = (new DirectoryInfo(sync_path)).Name;
                  YD_DataBuilder builder = new YD_DataBuilder();
                  builder.AddFolderToPath(dist_folder_name);
+                 yandex_disc_create_folder(builder.ToApiData(), http_client, true);// это не правиьно нужно заставить создовать папки рекурсивно
                  builder.AddFolderToPath(_source_dir_name);
 
                  YD_ApiData data = builder.ToApiData();
-                 //yandex_disc_create_folder(data, http_client, true);
+                 yandex_disc_create_folder(data, http_client, true);
                  _remotes.AddLast(data.path);
                }
 
@@ -536,15 +540,14 @@ namespace Synchronizer_Core.Synch
 
                     if (reletive_path != ".")
                     {
-
                         YD_DataBuilder builder = new YD_DataBuilder();
                         builder.AddFolderToPath(dist_folder_name);
-                        
-                        builder.AddFolderToPath(reletive_path); //Получаем ошибку сорее всего нужно исправть билдер
+                        builder.AddFolderToPath(reletive_path); 
 
                         YD_ApiData data = builder.ToApiData();
-                        //yandex_disc_create_folder(data, http_client, true);
+                        yandex_disc_create_folder(data, http_client, true);
                         _remotes.AddLast(data.path);
+                        
                     }
 
                 }
@@ -554,9 +557,10 @@ namespace Synchronizer_Core.Synch
 
         }
 
-        public void yandex_disc_create_folder(YD_ApiData folder_data, HttpClient client, bool check)
+        /*Метод создания папки в удалённой директории*/
+        /*Не может создавать сразу систему папок рекурсивно про это нужно помнить*/
+        protected void yandex_disc_create_folder(YD_ApiData folder_data, HttpClient client, bool check)
         {
-            //флаг check - подразумевает обязывать метод проверять создана ли папка - если да создовать её не нужно, нет - создать
 
             UriBuilder addr_with_data = new UriBuilder(adress);
             addr_with_data.Query = folder_data.querry_string();
