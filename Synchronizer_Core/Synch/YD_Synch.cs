@@ -2,9 +2,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Net.Http.Json;
 using System.Text;
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using System.Threading.Tasks;
 
 
@@ -272,8 +274,6 @@ namespace Synchronizer_Core.Synch
         /// </summary>
         authorize
     }
-
-
     public record YD_ApiData
     {
         public string path { get; set; } = "disk:";
@@ -298,7 +298,6 @@ namespace Synchronizer_Core.Synch
             return new string($"path={path}&limit={limit}&offset={offset}&fields={fields}");
         }
     }
-  
     public class YD_DataBuilder
     {
         private string _path = "disk:";
@@ -453,6 +452,7 @@ namespace Synchronizer_Core.Synch
         }
     }
 
+
     public class YD_Synch : ISynch
     {
         /*Поля класса*/
@@ -476,7 +476,16 @@ namespace Synchronizer_Core.Synch
 
         public void Synchronize(Manage_Type manage_type = Manage_Type.Full)
         {
-            throw new NotImplementedException();
+
+            switch (manage_type) { 
+                
+                case Manage_Type.Full:
+                    {
+                        break;
+                    }
+                default: { throw new NotImplementedException($"This method can`t operate with this manage type:{manage_type}"); }
+            }
+
         }
 
         public void Add_Path(string sync_path, string dist_folder_name)
@@ -516,8 +525,8 @@ namespace Synchronizer_Core.Synch
                 }
             }
 
+
             /*Папки в удалённой директории*/
-            
             LinkedList<string> _remotes = new LinkedList<string>();
             using (var http_client = new HttpClient())
             {
@@ -581,7 +590,7 @@ namespace Synchronizer_Core.Synch
 
                 if (_resp.StatusCode == System.Net.HttpStatusCode.OK) {
 
-                    Console.WriteLine(_resp.Content.ReadAsStringAsync().Result);
+                    //Console.WriteLine(_resp.Content.ReadAsStringAsync().Result);
                 }
                 else
                 {
@@ -592,6 +601,45 @@ namespace Synchronizer_Core.Synch
                 }
 
             } 
+        }
+
+        public void yandex_disc_get_all_files(YD_ApiData folder_data, HttpClient client)
+        {
+            
+            HttpRequestMessage _req = new HttpRequestMessage(HttpMethod.Get, adress);
+            HttpResponseMessage? _resp = null;
+
+            try
+            {
+                _req.Headers.Add("Authorization", token);
+                _resp = client.SendAsync(_req).Result;
+            } catch (Exception ex) { Errors.AddLast(ex); return; }
+
+            
+             String _getted_json = _resp.Content.ReadAsStringAsync().Result;
+             JsonNode? _root = null;
+             try { _root = JsonNode.Parse(_getted_json); } catch(Exception e) { Errors.AddLast(e); return; }
+             
+            
+             JsonObject? _obj = _root?.AsObject();
+
+             JsonNode? embed = null;
+             try { embed = _obj.First(node => node.Key == "_embedded").Value; } catch(Exception e) {Errors.AddLast(e); return; }
+             
+             if (embed is JsonObject obj)
+             {
+                if(obj.First(node=>node.Key == "items").Value is JsonArray files)
+                {
+
+                } else { Errors.AddLast(new Exception($"Не нашли массив ")); }
+             }
+             
+             
+
+
+
+
+            
         }
 
         /*Дополниительные мтеоды*/

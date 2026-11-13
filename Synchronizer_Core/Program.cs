@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using System.Text.Json;
 
 YD_Synch test = new YD_Synch("STAB");
-test.Add_Path("C:\\Users\\Макс\\Desktop\\курсачи", "Test");
+//test.Add_Path("C:\\Users\\Макс\\Desktop\\курсачи", "Test");
 
 foreach(var item in test.Export_Data())
 {
