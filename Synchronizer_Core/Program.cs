@@ -1,8 +1,61 @@
 ﻿
 using Synchronizer_Core;
 using Synchronizer_Core.Vault_Manager;
+using Synchronizer_Core.Synch;
+
 using System.Collections.Generic;
 using System.Text.Json;
+
+YD_Synch test = new YD_Synch("STAB");
+YD_DataBuilder dataBuilder = new YD_DataBuilder();
+dataBuilder.Limit = 300;
+dataBuilder.AddFolderToPath("Корпус_4");
+//dataBuilder.Fields = [YD_Field.file, YD_Field.path, YD_Field.modified, YD_Field.name, YD_Field.size];
+
+YD_ApiData apiData = dataBuilder.ToApiData();
+//apiData.fields = "_embedded.items.name,_embedded.items.path,_embedded.items.modified,_embedded.items.size,_embedded.items.type,_embedded.items.mime_type";
+
+using (var clinet = new HttpClient())
+{
+       var res = test.yandex_disc_get_all_files(apiData, clinet);    
+
+    foreach(var r in res)
+    {
+        Console.WriteLine(r.Item1);
+        Console.WriteLine(r.Item2);
+        Console.WriteLine("\n");
+    }
+}
+
+
+foreach(var item in test.Export_Data())
+{
+    Console.WriteLine($"{item.Source}>>>{item.Distination}");
+}
+
+foreach(var error in test.Errors)
+{
+    Console.WriteLine(error.Message);
+}
+
+/*using (var http_client = new HttpClient())
+{
+    YD_DataBuilder builder = new YD_DataBuilder();
+    builder.AddFolderToPath("test_0");
+    builder.AddFolderToPath("test_1");
+
+    Console.WriteLine(builder.ToApiData().ToString());
+
+    test.yandex_disc_create_folder(builder.ToApiData(), http_client, true);
+
+    foreach(var excp in test.Errors)
+    {
+        Console.WriteLine(excp.Message);
+    }
+
+}*/
+
+//test.Add_Path("C:\\Users\\Макс\\Desktop\\Json Processor 1", "obsidian");
 
 
 //Directory_Manager manage = new Directory_Manager();
