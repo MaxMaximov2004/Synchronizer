@@ -603,38 +603,59 @@ namespace Synchronizer_Core.Synch
             } 
         }
 
-        public void yandex_disc_get_all_files(YD_ApiData folder_data, HttpClient client)
+        public LinkedList<Tuple<String,DateTime> >? yandex_disc_get_all_files(YD_ApiData folder_data, HttpClient client)
         {
-            
-            HttpRequestMessage _req = new HttpRequestMessage(HttpMethod.Get, adress);
+            UriBuilder addr_with_data = new UriBuilder(adress);
+            folder_data.fields = "_embedded.items.name,_embedded.items.path,_embedded.items.modified,_embedded.items.size,_embedded.items.type,_embedded.items.mime_type";
+            addr_with_data.Query = folder_data.querry_string();
+
+
+            HttpRequestMessage _req = new HttpRequestMessage(HttpMethod.Get, addr_with_data.Uri);
             HttpResponseMessage? _resp = null;
 
             try
             {
                 _req.Headers.Add("Authorization", token);
+
+                //Console.WriteLine(_req.Content?.ReadAsStringAsync().Result);
+                //Console.WriteLine(_req.ToString());
+                //Console.WriteLine("\n\n");
+
+
                 _resp = client.SendAsync(_req).Result;
-            } catch (Exception ex) { Errors.AddLast(ex); return; }
+            } catch (Exception ex) { Errors.AddLast(ex); return null; }
 
             
              String _getted_json = _resp.Content.ReadAsStringAsync().Result;
-             JsonNode? _root = null;
-             try { _root = JsonNode.Parse(_getted_json); } catch(Exception e) { Errors.AddLast(e); return; }
-             
             
+            //Console.WriteLine(_getted_json); 
+
+             JsonNode? _root = null;
+             try { _root = JsonNode.Parse(_getted_json); } catch(Exception e) { Errors.AddLast(e); return null; }
+             
              JsonObject? _obj = _root?.AsObject();
 
              JsonNode? embed = null;
-             try { embed = _obj.First(node => node.Key == "_embedded").Value; } catch(Exception e) {Errors.AddLast(e); return; }
+             try { embed = _obj.First(node => node.Key == "_embedded").Value; } catch(Exception e) {Errors.AddLast(e); return null; }
              
+             LinkedList<Tuple<String,DateTime>> _res = new LinkedList<Tuple<String,DateTime>>();
              if (embed is JsonObject obj)
              {
                 if(obj.First(node=>node.Key == "items").Value is JsonArray files)
                 {
-
+                    //Console.WriteLine("\nFind Files:\n");
+                    foreach (var file in files)
+                    {
+                        //Console.WriteLine(file.ToJsonString());
+                        String path = file["path"].GetValue<String>();
+                        DateTime modified = file["modified"].GetValue<DateTime>();
+                        _res.AddLast(Tuple.Create<String, DateTime>(path, modified));
+                        //Console.WriteLine($"{path} {modified}");
+                    }
                 } else { Errors.AddLast(new Exception($"Не нашли массив ")); }
              }
              
-             
+             return _res;
 
 
 
