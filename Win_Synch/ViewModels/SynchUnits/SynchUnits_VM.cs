@@ -118,8 +118,9 @@ namespace Win_Synch.ViewModels.SynchUnits
             Debug.WriteLine("Begin synch");
             if (Synch_Manager != null) 
             {
-                Thread thread = new Thread(() => { Synch_Manager.Synchronize(Manage_Type); });
-                thread.Start();
+                Task.Factory.StartNew(() => {Synch_Manager.Synchronize(Manage_Type);}, TaskCreationOptions.AttachedToParent);
+                //Thread thread = new Thread(() => { Synch_Manager.Synchronize(Manage_Type); });
+                //thread.Start();
             }
             //Synch_Manager?.Synchronize();
         }
